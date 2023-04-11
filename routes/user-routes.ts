@@ -3,8 +3,12 @@ import AuthController from "../controllers/AuthController";
 import Router from 'express'
 import {passport} from "../core/passport";
 import {adminMiddleware} from "../middleware/authMiddleware";
+import { uploader } from '../core/uploader';
+
 const router = new Router()
 
+router.post('/admin/parse-xlsx', [passport.authenticate('jwt', { session: false }), adminMiddleware, uploader.single('file')],
+    AuthController.parseXLSX);
 router.post('/admin/register', [passport.authenticate('jwt', { session: false }), adminMiddleware, registerValidations], AuthController.register);
 router.post('/admin/query', [passport.authenticate('jwt', { session: false }), adminMiddleware], AuthController.getAll);
 router.delete('/admin/:id', passport.authenticate('jwt', { session: false }), AuthController.delete);

@@ -6,10 +6,22 @@ import {validationResult} from "express-validator";
 import {ApiError} from "../error/ApiError";
 import {generateMD5} from "../utils/generateHast";
 import {UserModelInterface} from "../@types";
+import xlsx from 'node-xlsx';
+import * as path from "path";
+import * as fs from "fs";
+
+function getAppRootDir() {
+    let currentDir = __dirname
+    while (!fs.existsSync(path.join(currentDir, 'package.json'))) {
+        currentDir = path.join(currentDir, '..')
+    }
+    return currentDir
+}
 
 class AuthController {
 
     authCallback(req: express.Request, res: express.Response) {
+        console.log('req', req)
         res.send(
             `<script>window.opener.postMessage('${JSON.stringify(
                 req.user,
@@ -23,6 +35,59 @@ class AuthController {
             await User.destroy({where: {id}});
             res.status(201).json({
                 message: 'Пользователь удален'
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async parseXLSX(req: express.Request, res: express.Response) {
+        try {
+            const filePath = req.file.path;
+
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: process.env.MAIL,
+                    pass: process.env.PASS
+                }
+            });
+
+            const parse = xlsx.parse(filePath);
+
+            const rows = parse[0].data;
+
+            rows.shift()
+
+            await Promise.all(rows.map(async (el) => {
+                const randomStr = Math.random().toString();
+
+                const confirmationCode = generateMD5(process.env.SECRET_KEY + randomStr || randomStr)
+
+                await User.create({
+                    email: el[3] as string,
+                    confirmationCode
+                });
+
+                await transporter.sendMail({
+                    from: process.env.MAIL,
+                    to: el[3] as string,
+                    subject: "Продолжение регистрации",
+                    html: `<h1>Продолжение регистрации</h1>
+        <h2>Привет</h2>
+        <p>Для продолжения регистрации перейдите по ссылке !</p>
+        <a href=${process.env.FRONT_URL}/auth/register?t=${confirmationCode}> Перейти</a>
+        </div>`,
+                });
+
+            }))
+
+            fs.rmSync(filePath, {
+                force: true,
+            });
+
+            res.status(201).json({
+                message: 'Пользователи добавлены'
             });
         } catch (e) {
             console.log(e)
@@ -82,7 +147,13 @@ class AuthController {
         let {skip, take} = paging
         let offset = skip
         let users;
-        users = await User.findAndCountAll({limit: take, attributes: {exclude: ['password']}, distinct: true, where: {...filter}, offset})
+        users = await User.findAndCountAll({
+            limit: take,
+            attributes: {exclude: ['password']},
+            distinct: true,
+            where: {...filter},
+            offset
+        })
         return res.json(users)
     }
 
@@ -149,6 +220,7 @@ class AuthController {
             const data: UserModelInterface = {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
+                vkId: req.body?.vkId || null,
                 confirmationCode: null,
                 password: generateMD5(req.body.password + process.env.SECRET_KEY),
             };

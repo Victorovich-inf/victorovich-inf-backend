@@ -10,8 +10,7 @@ module.exports = {
     "password": process.env.DB_PASSWORD,
     "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
-    "port": "8889",
-    // "socketPath": "/Applications/MAMP/tmp/mysql/mysql.sock",
+    "port": process.env.DB_PORT,
     "dialect": "mysql"
   },
   "test": {

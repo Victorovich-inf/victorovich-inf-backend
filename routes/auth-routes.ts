@@ -8,30 +8,18 @@ router.post('/complete', completeValidations, AuthController.complete);
 router.post('/login', passport.authenticate('login'), AuthController.afterLogin);
 router.get('/check', passport.authenticate('jwt', { session: false }), AuthController.afterLogin);
 
-router.get("/vkontakte-login", passport.authenticate("vkontakte-login"));
-router.get("/vkontakte-register", passport.authenticate("register", {passReqToCallback: true}));
+router.get("/vkontakte-login", passport.authenticate("vkontakte-login", {session: false}));
+router.get("/vkontakte-register", passport.authenticate('register', {session: false}));
 
 router.get(
     '/vkontakte/callback',
-    passport.authenticate('vkontakte-login'),
+    passport.authenticate('vkontakte-login', {session: false}),
     AuthController.authCallback,
 );
 
 router.get(
     '/vkontakte/register/callback',
-    function(req, res, next) {
-        passport.authenticate('register', function(err, user, info) {
-            if (err || !user) {
-                console.log('err')
-                // failed
-            } else {
-                console.log(req)
-                console.log(user)
-                console.log('success')
-                // successful
-            }
-        })(req, res, next);
-    },
+    passport.authenticate('register', {session: false}),
     AuthController.authCallback,
 );
 

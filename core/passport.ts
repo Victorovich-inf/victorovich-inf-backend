@@ -7,6 +7,7 @@ import {User} from '../models';
 import {generateMD5} from '../utils/generateHast';
 import {UserModelInterface} from "../@types";
 import jwt from "jsonwebtoken";
+import {JSON} from "sequelize";
 
 passport.use('login', new LocalStrategy(
         {
@@ -80,7 +81,7 @@ passport.use('vkontakte-login',
             done
         ) {
             try {
-                const findUser = await User.findOne({
+                let findUser = await User.findOne({
                     where: {
                         vkId: profile.id,
                     },
@@ -90,8 +91,9 @@ passport.use('vkontakte-login',
                 if (!findUser) {
                     done(null, false);
                 } else {
+                    delete findUser['password']
                     done(null, {
-                        user: {
+                        data: {
                             ...findUser
                         },
                         token: jwt.sign({data: findUser}, process.env.SECRET_KEY || '123', {
@@ -115,7 +117,6 @@ passport.use('register',
             callbackURL: `${process.env.SERVER_URL}/auth/vkontakte/register/callback`,
         },
         async function myVerifyCallbackFn(
-            req,
             accessToken,
             refreshToken,
             params,
@@ -123,36 +124,20 @@ passport.use('register',
             done
         ) {
             try {
-                const findUser = await User.findOne({
-                    where: {
-                        vkId: profile.id,
-                    },
-                    raw: true
-                });
-                if (findUser) {
-                    done(null, {
-                        user: {
-                            ...findUser
-                        },
-                        token: jwt.sign({data: findUser}, process.env.SECRET_KEY || '123', {
-                            expiresIn: '30 days',
-                        }),
-                    });
-                } else {
-                    const createdUser = await User.create({
-                        vkId: profile.id,
-                        firstName: profile.name.givenName,
-                        lastName: profile.name.familyName,
-                    });
+                const data = {
+                    id: profile.id,
+                    firstName: profile.name.givenName,
+                    lastName: profile.name.familyName,
+                }
+                const jsonAnswer = {
+                    data,
+                    type: 'register'
+                }
 
-                    done(null, {
-                        user: {
-                            ...createdUser
-                        },
-                        token: jwt.sign({data: createdUser}, process.env.SECRET_KEY || '123', {
-                            expiresIn: '30 days',
-                        }),
-                    })
+                if (profile) {
+                    done(null, jsonAnswer)
+                } else {
+                    done(null, false)
                 }
             } catch (e) {
                 console.log(e)

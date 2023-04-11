@@ -47,7 +47,7 @@ module.exports = {
         type: Sequelize.DATE
       },
       vkId: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.STRING
       }
     });
