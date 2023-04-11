@@ -8,6 +8,84 @@ import {generateMD5} from "../utils/generateHast";
 import {UserModelInterface} from "../@types";
 
 class AuthController {
+
+    authCallback(req: express.Request, res: express.Response) {
+        res.send(
+            `<script>window.opener.postMessage('${JSON.stringify(
+                req.user,
+            )}', '*');window.close();</script>`,
+        );
+    }
+
+    async delete(req: express.Request, res: express.Response) {
+        try {
+            let {id} = req.params
+            await User.destroy({where: {id}});
+            res.status(201).json({
+                message: 'Пользователь удален'
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async ban(req: express.Request, res: express.Response) {
+        try {
+            let {id} = req.params
+            await User.update({banned: true}, {where: {id}})
+            res.status(201).json({
+                message: 'Пользователь забанен'
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async makeСurator(req: express.Request, res: express.Response) {
+        try {
+            let {id} = req.params
+            await User.update({role: 2}, {where: {id}})
+            res.status(201).json({
+                message: 'Пользователь назначен куратором'
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async removeСurator(req: express.Request, res: express.Response) {
+        try {
+            let {id} = req.params
+            await User.update({role: 0}, {where: {id}})
+            res.status(201).json({
+                message: 'Пользователь убран из кураторов'
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async unban(req: express.Request, res: express.Response) {
+        try {
+            let {id} = req.params
+            await User.update({banned: false}, {where: {id}})
+            res.status(201).json({
+                message: 'Пользователь разбанен'
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async getAll(req: express.Request, res: express.Response) {
+        let {filter, paging} = req.body
+        let {skip, take} = paging
+        let offset = skip
+        let users;
+        users = await User.findAndCountAll({limit: take, attributes: {exclude: ['password']}, distinct: true, where: {...filter}, offset})
+        return res.json(users)
+    }
+
     async register(req: express.Request, res: express.Response, next: express.NextFunction) {
         const errors = validationResult(req);
 
@@ -20,7 +98,7 @@ class AuthController {
         });
 
         if (!errors.isEmpty()) {
-            res.status(400).json({status: 'error', errors: errors.array()});
+            res.status(400).json(errors.array());
             return;
         }
 
@@ -41,7 +119,7 @@ class AuthController {
                 html: `<h1>Продолжение регистрации</h1>
         <h2>Привет</h2>
         <p>Для продолжения регистрации перейдите по ссылке !</p>
-        <a href=${process.env.FRONT_URL}/confirm?t=${confirmationCode}> Перейти</a>
+        <a href=${process.env.FRONT_URL}/auth/register?t=${confirmationCode}> Перейти</a>
         </div>`,
             }).catch(() => next(ApiError.internal('Ошибка при отправке email')));
 
@@ -62,7 +140,7 @@ class AuthController {
         }
 
         try {
-            const user = await User.findOne({where: {confirmationCode: req.body.token}})
+            const user = await User.findOne({where: {confirmationCode: req.body.token}, raw: true})
 
             if (!user) {
                 return next(ApiError.internal('Неверный токен!'))
@@ -77,8 +155,16 @@ class AuthController {
 
             await User.update(data, {where: {confirmationCode: req.body.token}})
 
-            res.status(201).json({
-                message: 'Регистрация завершена'
+            let userData = user;
+            delete userData['password']
+
+            res.json({
+                user: {
+                    ...userData
+                },
+                token: jwt.sign({data: userData}, process.env.SECRET_KEY || '123', {
+                    expiresIn: '30 days',
+                }),
             });
         } catch {
             return next(ApiError.internal('Ошибка при создании пользователя'))

@@ -1,9 +1,12 @@
 import passport from 'passport';
 import {Strategy as LocalStrategy} from 'passport-local';
 import {Strategy as JWTstrategy, ExtractJwt} from 'passport-jwt';
+import {Strategy as VKontakteStrategy} from 'passport-vkontakte';
+import {Strategy as VKontakteStrategyRegister} from 'passport-vkontakte';
 import {User} from '../models';
 import {generateMD5} from '../utils/generateHast';
 import {UserModelInterface} from "../@types";
+import jwt from "jsonwebtoken";
 
 passport.use('login', new LocalStrategy(
         {
@@ -16,6 +19,10 @@ passport.use('login', new LocalStrategy(
 
                 if (!user) {
                     return done(null, false);
+                }
+
+                if (user.banned) {
+                    done(null, false);
                 }
 
                 if (!user.confirmationCode && user.password === generateMD5(password + process.env.SECRET_KEY)) {
@@ -42,6 +49,10 @@ passport.use(
             try {
                 const user = await User.findOne({where: {id: payload.data.id}, raw: true});
 
+                if (user.banned) {
+                    done(null, false);
+                }
+
                 if (user) {
                     return done(null, user);
                 }
@@ -54,6 +65,102 @@ passport.use(
     ),
 );
 
+passport.use('vkontakte-login',
+    new VKontakteStrategy(
+        {
+            clientID: process.env.VKONTAKTE_APP_ID,
+            clientSecret: process.env.VKONTAKTE_APP_SECRET,
+            callbackURL: `${process.env.SERVER_URL}/auth/vkontakte/callback`,
+        },
+        async function myVerifyCallbackFn(
+            accessToken,
+            refreshToken,
+            params,
+            profile,
+            done
+        ) {
+            try {
+                const findUser = await User.findOne({
+                    where: {
+                        vkId: profile.id,
+                    },
+                    raw: true
+                });
+
+                if (!findUser) {
+                    done(null, false);
+                } else {
+                    done(null, {
+                        user: {
+                            ...findUser
+                        },
+                        token: jwt.sign({data: findUser}, process.env.SECRET_KEY || '123', {
+                            expiresIn: '30 days',
+                        }),
+                    })
+                }
+            } catch (e) {
+                console.log(e)
+            }
+
+        }
+    )
+);
+
+passport.use('register',
+    new VKontakteStrategyRegister(
+        {
+            clientID: process.env.VKONTAKTE_APP_ID,
+            clientSecret: process.env.VKONTAKTE_APP_SECRET,
+            callbackURL: `${process.env.SERVER_URL}/auth/vkontakte/register/callback`,
+        },
+        async function myVerifyCallbackFn(
+            req,
+            accessToken,
+            refreshToken,
+            params,
+            profile,
+            done
+        ) {
+            try {
+                const findUser = await User.findOne({
+                    where: {
+                        vkId: profile.id,
+                    },
+                    raw: true
+                });
+                if (findUser) {
+                    done(null, {
+                        user: {
+                            ...findUser
+                        },
+                        token: jwt.sign({data: findUser}, process.env.SECRET_KEY || '123', {
+                            expiresIn: '30 days',
+                        }),
+                    });
+                } else {
+                    const createdUser = await User.create({
+                        vkId: profile.id,
+                        firstName: profile.name.givenName,
+                        lastName: profile.name.familyName,
+                    });
+
+                    done(null, {
+                        user: {
+                            ...createdUser
+                        },
+                        token: jwt.sign({data: createdUser}, process.env.SECRET_KEY || '123', {
+                            expiresIn: '30 days',
+                        }),
+                    })
+                }
+            } catch (e) {
+                console.log(e)
+            }
+
+        }
+    )
+);
 
 passport.serializeUser(function (user, done) {
     done(null, user.id);

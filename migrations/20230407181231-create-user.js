@@ -11,7 +11,7 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true
       },
       password: {
@@ -45,6 +45,10 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
+      },
+      vkId: {
+        allowNull: false,
+        type: Sequelize.STRING
       }
     });
   },

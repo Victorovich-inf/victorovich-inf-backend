@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     role: DataTypes.INTEGER,
     banned: DataTypes.BOOLEAN,
     confirmationCode: DataTypes.STRING,
+    vkId: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'User',
