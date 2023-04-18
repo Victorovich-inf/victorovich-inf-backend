@@ -7,16 +7,7 @@ import {ApiError} from "../error/ApiError";
 import {generateMD5} from "../utils/generateHast";
 import {UserModelInterface} from "../@types";
 import xlsx from 'node-xlsx';
-import * as path from "path";
 import * as fs from "fs";
-
-function getAppRootDir() {
-    let currentDir = __dirname
-    while (!fs.existsSync(path.join(currentDir, 'package.json'))) {
-        currentDir = path.join(currentDir, '..')
-    }
-    return currentDir
-}
 
 class AuthController {
 
