@@ -11,6 +11,7 @@ router.post('/admin/', [passport.authenticate('jwt', { session: false }), adminM
 router.post('/admin/query', [passport.authenticate('jwt', { session: false }), adminMiddleware],
     CourseController.getAll);
 router.get('/admin/:id', [passport.authenticate('jwt', { session: false }), adminMiddleware], CourseController.getOne);
+router.put('/admin/:id', [passport.authenticate('jwt', { session: false }), adminMiddleware], CourseController.savePage);
 router.delete('/admin/:id', [passport.authenticate('jwt', { session: false }), adminMiddleware], CourseController.delete);
 
 

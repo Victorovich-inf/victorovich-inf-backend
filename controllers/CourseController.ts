@@ -57,6 +57,22 @@ class CourseController {
         return res.json(courses)
     }
 
+    async savePage(req: express.Request, res: express.Response, next: express.NextFunction) {
+        try {
+            let {data} = req.body
+
+            console.log(data)
+
+            res.status(200).json({
+                message: 'Курс сохранен'
+            })
+        } catch {
+            res.status(500).json({
+                message: 'Ошибка при сохранении курса'
+            })
+        }
+    }
+
     async create(req: express.Request, res: express.Response, next: express.NextFunction) {
         const errors = validationResult(req);
         const filePath = req.file.path;
