@@ -1,7 +1,8 @@
 import express from 'express';
-import {Course, Lesson, Task} from '../models'
+import {Course, Lesson, Task, Content} from '../models'
 import {validationResult} from "express-validator";
 import fs from "fs";
+import {Content as ContentType} from "../@types";
 
 class CourseController {
 
@@ -30,10 +31,18 @@ class CourseController {
             const course = await Course.findOne({where: {id},
                 include: {
                     model: Lesson,
-                    include: {
-                        model: Task
-                    }
-                }
+                    include: [
+                        {
+                            model: Task,
+                            include: {
+                                model: Content
+                            }
+                        },
+                        {
+                            model: Content
+                        }
+                    ]
+            }
             });
             res.status(200).json(course);
         } catch (e) {
@@ -61,7 +70,26 @@ class CourseController {
         try {
             let {data} = req.body
 
-            console.log(data)
+            const content = data as ContentType;
+
+            console.log(content)
+
+            Object.keys(content).map(async (el) => {
+                let key = el.split('_')[0]
+                let type = el.split('_')[1]
+
+                if (type === 'lesson') {
+                    if (content[el].elements) {
+                        const elements = content[el].elements;
+                        await Content.update({content: elements?.length ? elements : []}, {where: {lessonId: key}})
+                    }
+                } else if (type === 'task') {
+                    if (content[el].elements) {
+                        const elements = content[el].elements;
+                        await Content.update({content: elements?.length ? elements : []}, {where: {taskId: key}})
+                    }
+                }
+            })
 
             res.status(200).json({
                 message: 'Курс сохранен'
@@ -101,9 +129,19 @@ class CourseController {
 
             const lessonId = lesson.id;
 
-            await Task.create({
+            await Content.create({
+                lessonId
+            })
+
+            const task = await Task.create({
                 name: 'Задание 1',
                 lessonId
+            })
+
+            const taskId = task.id;
+
+            await Content.create({
+                taskId
             })
 
             res.status(201).json({

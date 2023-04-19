@@ -16,8 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Content.init({
-    content: DataTypes.TEXT,
-    type: DataTypes.ENUM('video', 'file', 'image', 'text'),
+    content: DataTypes.JSON,
     taskId: DataTypes.INTEGER,
     lessonId: DataTypes.INTEGER,
   }, {

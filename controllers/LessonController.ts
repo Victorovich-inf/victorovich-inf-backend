@@ -1,5 +1,5 @@
 import express from 'express';
-import {Course, Lesson} from '../models'
+import {Course, Lesson, Content} from '../models'
 import {validationResult} from "express-validator";
 
 class LessonController {
@@ -35,9 +35,15 @@ class LessonController {
 
         try {
 
-            await Lesson.create({
+            const data = await Lesson.create({
                 name: req.body.name,
                 courseId: req.body.courseId
+            })
+
+            const lessonId = data.id;
+
+            await Content.create({
+                lessonId
             })
 
             res.status(201).json({

@@ -11,11 +11,7 @@ module.exports = {
       },
       content: {
         type: Sequelize.JSON,
-        allowNull: false
-      },
-      type: {
-        type: Sequelize.ENUM('video', 'file', 'image', 'text'),
-        allowNull: false
+        allowNull: true
       },
       lessonId: {
         type: Sequelize.INTEGER,

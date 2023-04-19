@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       Lesson.hasMany(models.Task, {
         foreignKey: 'lessonId',
       })
-      Lesson.hasMany(models.Content, {
+      Lesson.hasOne(models.Content, {
         foreignKey: 'lessonId',
       })
     }

@@ -1,5 +1,5 @@
 import express from 'express';
-import {Task, Lesson} from '../models'
+import {Task, Lesson, Content} from '../models'
 import {validationResult} from "express-validator";
 
 class TaskController {
@@ -34,9 +34,15 @@ class TaskController {
         }
 
         try {
-            await Task.create({
+            const data = await Task.create({
                 name: req.body.name,
                 lessonId: req.body.lessonId
+            })
+
+            const taskId = data.id;
+
+            await Content.create({
+                taskId
             })
 
             res.status(201).json({

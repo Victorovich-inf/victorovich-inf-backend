@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         foreignKey: 'lessonId',
       });
-      Task.hasMany(models.Content, {
+      Task.hasOne(models.Content, {
         foreignKey: 'taskId',
       })
     }
