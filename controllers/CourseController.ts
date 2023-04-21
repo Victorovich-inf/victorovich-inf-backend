@@ -11,10 +11,10 @@ class CourseController {
             let {id} = req.params
 
             const course = Course.findOne({where: {id}})
-
-            fs.rmSync(course.logo, {
-                force: true,
-            })
+            //
+            // fs.rmSync(course.logo, {
+            //     force: true,
+            // })
 
             await Course.destroy({where: {id}});
             res.status(201).json({
