@@ -56,6 +56,31 @@ class LessonController {
         }
     }
 
+    async edit(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const errors = validationResult(req);
+
+        let {id} = req.params
+
+        if (!errors.isEmpty()) {
+            res.status(400).json(errors.array());
+            return;
+        }
+
+        try {
+            await Lesson.update(
+                req.body,
+                { where: { id } }
+            )
+
+            res.status(201).json({
+                message: 'Урок изменён',
+            });
+        } catch {
+            res.status(500).json({
+                message: 'Ошибка при изменении урока'
+            })
+        }
+    }
 
 }
 

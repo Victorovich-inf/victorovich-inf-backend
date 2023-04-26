@@ -19,7 +19,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   Lesson.init({
     name: DataTypes.STRING,
+    public: DataTypes.BOOLEAN,
     courseId: DataTypes.INTEGER,
+    index: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Lesson',

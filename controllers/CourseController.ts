@@ -34,9 +34,14 @@ class CourseController {
                     include: [
                         {
                             model: Task,
-                            include: {
-                                model: Content
-                            }
+                            include: [
+                                {
+                                    model: Content
+                                },
+                                {
+                                    model: Lesson
+                                }
+                            ]
                         },
                         {
                             model: Content
@@ -72,8 +77,6 @@ class CourseController {
 
             const content = data as ContentType;
 
-            console.log(content)
-
             Object.keys(content).map(async (el) => {
                 let key = el.split('_')[0]
                 let type = el.split('_')[1]
@@ -100,6 +103,33 @@ class CourseController {
             })
         }
     }
+
+    async edit(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const errors = validationResult(req);
+
+        let {id} = req.params
+
+        if (!errors.isEmpty()) {
+            res.status(400).json(errors.array());
+            return;
+        }
+
+        try {
+            await Course.update(
+                req.body,
+                { where: { id } }
+            )
+
+            res.status(201).json({
+                message: 'Курс изменён',
+            });
+        } catch {
+            res.status(500).json({
+                message: 'Ошибка при изменении курса'
+            })
+        }
+    }
+
 
     async create(req: express.Request, res: express.Response, next: express.NextFunction) {
         const errors = validationResult(req);

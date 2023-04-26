@@ -16,7 +16,14 @@ module.exports = (sequelize, DataTypes) => {
   }
   Task.init({
     name: DataTypes.STRING,
+    answer: DataTypes.STRING,
+    prompt: DataTypes.STRING,
+    taskSolutionText: DataTypes.STRING,
+    taskSolutionFile: DataTypes.STRING,
     lessonId: DataTypes.INTEGER,
+    public: DataTypes.BOOLEAN,
+    answerFile: DataTypes.BOOLEAN,
+    index: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Task',

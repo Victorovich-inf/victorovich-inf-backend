@@ -12,9 +12,29 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      answer: {
+        type: Sequelize.STRING
+      },
+      prompt: {
+        type: Sequelize.STRING
+      },
+      taskSolutionText: {
+        type: Sequelize.STRING
+      },
+      taskSolutionFile: {
+        type: Sequelize.STRING
+      },
+      answerFile: {
+        defaultValue: false,
+        type: Sequelize.BOOLEAN
+      },
       public: {
         defaultValue: false,
         type: Sequelize.BOOLEAN
+      },
+      index: {
+        defaultValue: 0,
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

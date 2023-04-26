@@ -17,6 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     dateStart: DataTypes.DATE,
     cost: DataTypes.INTEGER,
     free: DataTypes.BOOLEAN,
+    public: DataTypes.BOOLEAN,
   }, {
     sequelize,
     modelName: 'Course',

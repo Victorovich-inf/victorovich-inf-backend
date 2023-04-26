@@ -1,4 +1,4 @@
-'use strict';
+ 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
@@ -26,6 +26,10 @@ module.exports = {
           key: 'id',
           as: 'courseId',
         }
+      },
+      index: {
+        defaultValue: 0,
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

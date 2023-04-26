@@ -55,6 +55,41 @@ class TaskController {
         }
     }
 
+    async edit(req: express.Request, res: express.Response) {
+        const errors = validationResult(req);
+        const filePath = req?.file?.path;
+
+        let {id} = req.params
+
+        if (!errors.isEmpty()) {
+            res.status(400).json(errors.array());
+            return;
+        }
+
+        try {
+            if (filePath) {
+                await Task.update(
+                    {...req.body, taskSolutionFile: filePath},
+                    { where: { id } }
+                )
+            } else {
+                await Task.update(
+                    req.body,
+                    { where: { id } }
+                )
+            }
+
+            res.status(201).json({
+                message: 'Задача изменена',
+            });
+        } catch {
+            res.status(500).json({
+                message: 'Ошибка при изменении задачи'
+            })
+        }
+    }
+
+
 
 }
 
