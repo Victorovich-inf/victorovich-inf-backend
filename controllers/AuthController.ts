@@ -12,7 +12,6 @@ import * as fs from "fs";
 class AuthController {
 
     authCallback(req: express.Request, res: express.Response) {
-        console.log('req', req)
         res.send(
             `<script>window.opener.postMessage('${JSON.stringify(
                 req.user,

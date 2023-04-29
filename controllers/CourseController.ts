@@ -1,7 +1,6 @@
 import express from 'express';
-import {Course, Lesson, Task, Content} from '../models'
+import {Course, Lesson, Task, Content, CourseUser} from '../models'
 import {validationResult} from "express-validator";
-import fs from "fs";
 import {Content as ContentType} from "../@types";
 
 class CourseController {
@@ -65,6 +64,11 @@ class CourseController {
             limit: take,
             distinct: true,
             where: {...filter},
+            include: [
+                {
+                    model: CourseUser,
+                }
+            ],
             offset
         })
 

@@ -8,6 +8,9 @@ module.exports = (sequelize, DataTypes) => {
       Course.hasMany(models.Lesson, {
         foreignKey: 'courseId',
       })
+      Course.hasMany(models.CourseUser, {
+        foreignKey: 'courseId',
+      })
     }
   }
   Course.init({

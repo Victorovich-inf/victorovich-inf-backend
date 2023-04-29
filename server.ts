@@ -9,6 +9,7 @@ import userRoutes from './routes/user-routes'
 import courseRoutes from './routes/course-routes'
 import lessonRoutes from './routes/lesson-routes'
 import taskRoutes from './routes/task-routes'
+import buyCourseRoutes from './routes/buy-course-routes'
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use('/user', userRoutes);
 app.use('/course', courseRoutes);
 app.use('/lesson', lessonRoutes);
 app.use('/task', taskRoutes);
+app.use('/buy-course', buyCourseRoutes);
 
 app.listen(5001, async (): Promise<void> => {
     console.log(User)
