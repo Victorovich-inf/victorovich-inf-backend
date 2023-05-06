@@ -1,5 +1,5 @@
 import express from 'express';
-import {Course, Lesson, Task, Content, CourseUser} from '../models'
+import {Course, Lesson, Task, Content, CourseUser, CuratorCourse, User} from '../models'
 import {validationResult} from "express-validator";
 import {Content as ContentType} from "../@types";
 
@@ -28,7 +28,7 @@ class CourseController {
         try {
             let {id} = req.params
             const course = await Course.findOne({where: {id},
-                include: {
+                include: [{
                     model: Lesson,
                     include: [
                         {
@@ -46,7 +46,12 @@ class CourseController {
                             model: Content
                         }
                     ]
-            }
+            }, {
+                    model: CuratorCourse,
+                    include: {
+                        model: User
+                    }
+                }]
             });
             res.status(200).json(course);
         } catch (e) {

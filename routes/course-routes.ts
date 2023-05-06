@@ -25,4 +25,8 @@ router.post('/admin/upload', [passport.authenticate('jwt', {session: false}), ad
     });
 })
 
+router.post('/query', [passport.authenticate('jwt', {session: false})],
+    CourseController.getAll);
+
+
 export default router;

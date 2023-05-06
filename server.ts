@@ -10,6 +10,7 @@ import courseRoutes from './routes/course-routes'
 import lessonRoutes from './routes/lesson-routes'
 import taskRoutes from './routes/task-routes'
 import buyCourseRoutes from './routes/buy-course-routes'
+import curatorRoutes from './routes/curator-routes'
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use('/course', courseRoutes);
 app.use('/lesson', lessonRoutes);
 app.use('/task', taskRoutes);
 app.use('/buy-course', buyCourseRoutes);
+app.use('/curator', curatorRoutes);
 
 app.listen(5001, async (): Promise<void> => {
     console.log(User)
