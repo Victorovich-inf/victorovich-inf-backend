@@ -80,6 +80,8 @@ class CourseController {
         return res.json(courses)
     }
 
+
+
     async savePage(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
             let {data} = req.body

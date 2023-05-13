@@ -1,7 +1,6 @@
 import Router from 'express'
 import {passport} from "../core/passport";
 import BuyCourseController from "../controllers/BuyCourseController";
-import {adminMiddleware} from "../middleware/authMiddleware";
 import {updateProgressValidations} from "../validations/course/updateProgress";
 
 const router = new Router()
