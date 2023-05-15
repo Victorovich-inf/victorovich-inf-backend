@@ -1,5 +1,5 @@
 import express from 'express';
-import {Course, Lesson, Task, Content, CourseUser, ProgressCourseUser} from '../models'
+import {Course, Lesson, Task, Content, CourseUser, ProgressCourseUser, CuratorCourse, User} from '../models'
 import {validationResult} from "express-validator";
 
 class BuyCourseController {
@@ -37,6 +37,12 @@ class BuyCourseController {
                                 model: ProgressCourseUser
                             }
                         ]
+                    },
+                    {
+                        model: CuratorCourse,
+                        include: {
+                            model: User
+                        }
                     }
                 ]
             });

@@ -11,6 +11,18 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.CuratorCourse, {
         foreignKey: 'userId',
       })
+      User.hasMany(models.Message, {
+        foreignKey: 'senderId',
+      })
+      User.hasMany(models.Message, {
+        foreignKey: 'recipientId',
+      })
+      User.hasMany(models.Chat, {
+        foreignKey: 'user1Id',
+      })
+      User.hasMany(models.Chat, {
+        foreignKey: 'user2Id',
+      })
     }
   }
   User.init({

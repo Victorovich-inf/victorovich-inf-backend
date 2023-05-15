@@ -11,6 +11,10 @@ import lessonRoutes from './routes/lesson-routes'
 import taskRoutes from './routes/task-routes'
 import buyCourseRoutes from './routes/buy-course-routes'
 import curatorRoutes from './routes/curator-routes'
+import chatRoutes from './routes/chat-routes'
+import {Server} from 'socket.io'
+import { createServer } from 'http'
+import onConnection from "./socket_io/onConnection";
 
 const app = express();
 
@@ -26,8 +30,21 @@ app.use('/lesson', lessonRoutes);
 app.use('/task', taskRoutes);
 app.use('/buy-course', buyCourseRoutes);
 app.use('/curator', curatorRoutes);
+app.use('/chat', chatRoutes);
 
-app.listen(5001, async (): Promise<void> => {
+const server = createServer(app)
+
+const io = new Server(server, {
+    cors: process.env.FRONT_URL as string,
+    serveClient: false
+})
+
+io.on('connection', (socket) => {
+    console.log('connection open')
+    onConnection(io, socket)
+})
+
+server.listen(5001, async (): Promise<void> => {
     console.log(User)
 });
 
