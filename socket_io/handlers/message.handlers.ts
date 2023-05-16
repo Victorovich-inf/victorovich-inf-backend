@@ -1,3 +1,5 @@
+import {Message, User} from '../../models'
+
 const messages = {}
 
 export default function messageHandlers(io, socket) {
@@ -8,14 +10,42 @@ export default function messageHandlers(io, socket) {
     }
 
     socket.on('message:get', async () => {
-        updateMessageList()
+        if (roomId) {
+            messages[roomId] = await Message.findAll({
+                where: {chatId: roomId}, distinct: true,
+                include: [
+                    {
+                        model: User,
+                        as: 'sender'
+                    },
+                    {
+                        model: User,
+                        as: 'recipient'
+                    }
+                ],
+            })
+            updateMessageList()
+        }
     })
 
-    socket.on('message:add', (message) => {
+    socket.on('message:add', async (message) => {
+        const created = await Message.create(message)
 
-        message.createdAt = Date.now()
+        const createdMessage = await Message.findOne({
+            where: {id: created.id}, distinct: true,
+            include: [
+                {
+                    model: User,
+                    as: 'sender'
+                },
+                {
+                    model: User,
+                    as: 'recipient'
+                }
+            ],
+        })
 
-        messages[roomId]?.push(message)
+        messages[roomId]?.push(createdMessage)
 
         updateMessageList()
     })

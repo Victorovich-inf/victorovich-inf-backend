@@ -10,4 +10,7 @@ router.post('/withCurator', [passport.authenticate('jwt', {session: false}), cre
 router.get('/', [passport.authenticate('jwt', {session: false})],
     ChatController.getAll)
 
+router.get('/room/:id', [passport.authenticate('jwt', {session: false})],
+    ChatController.getMessagesFromChat)
+
 export default router;

@@ -11,7 +11,7 @@ module.exports = {
       },
       message: {
         type: Sequelize.TEXT,
-        allowNull: false,
+        allowNull: true,
       },
       image: {
         type: Sequelize.STRING,

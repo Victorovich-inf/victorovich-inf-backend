@@ -7,10 +7,12 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Message.belongsTo(models.User, {
         onDelete: "CASCADE",
+        as: 'sender',
         foreignKey: 'senderId',
       });
       Message.belongsTo(models.User, {
         onDelete: "CASCADE",
+        as: 'recipient',
         foreignKey: 'recipientId',
       });
       Message.belongsTo(models.Chat, {

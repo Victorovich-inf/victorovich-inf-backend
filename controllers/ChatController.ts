@@ -1,5 +1,5 @@
 import express from 'express';
-import {Chat, User} from '../models'
+import {Chat, User, Message} from '../models'
 import {validationResult} from "express-validator";
 import {Op} from "sequelize";
 
@@ -49,12 +49,34 @@ class ChatController {
             }
         })
 
-        console.log(chats)
-
         return res.json(chats)
     }
 
 
+    async getMessagesFromChat(req: express.Request, res: express.Response) {
+        let messages;
+
+        let {id} = req.params
+
+        messages = await Message.findAndCountAll({
+            distinct: true,
+            include: [
+                {
+                    model: User,
+                    as: 'sender'
+                },
+                {
+                    model: User,
+                    as: 'recipient'
+                }
+            ],
+            where: {
+                chatId: id
+            }
+        })
+
+        return res.json(messages)
+    }
 }
 
 export default new ChatController();

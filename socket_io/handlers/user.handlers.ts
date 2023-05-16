@@ -14,6 +14,8 @@ export default function userHandlers(io, socket) {
 
     socket.on('user:add', async (user) => {
 
+        console.log('user add ')
+
         socket.to(roomId).emit('log', `User ${userName} connected`)
 
         user.socketId = socket.id
@@ -25,6 +27,8 @@ export default function userHandlers(io, socket) {
 
     socket.on('disconnect', () => {
         if (!users[roomId]) return
+
+        console.log('user disconnect ')
 
         socket.to(roomId).emit('log', `User ${userName} disconnected`)
 
