@@ -2,6 +2,7 @@ import express from 'express';
 import {Course, Lesson, Task, Content, CourseUser, CuratorCourse, User} from '../models'
 import {validationResult} from "express-validator";
 import {Content as ContentType} from "../@types";
+import {removeFile} from "../utils/file";
 
 class CourseController {
 
@@ -10,10 +11,9 @@ class CourseController {
             let {id} = req.params
 
             const course = Course.findOne({where: {id}})
-            //
-            // fs.rmSync(course.logo, {
-            //     force: true,
-            // })
+
+            if (course.logo)
+                await removeFile(course.logo)
 
             await Course.destroy({where: {id}});
             res.status(201).json({
@@ -27,7 +27,8 @@ class CourseController {
     async getOne(req: express.Request, res: express.Response) {
         try {
             let {id} = req.params
-            const course = await Course.findOne({where: {id},
+            const course = await Course.findOne({
+                where: {id},
                 include: [{
                     model: Lesson,
                     include: [
@@ -46,7 +47,7 @@ class CourseController {
                             model: Content
                         }
                     ]
-            }, {
+                }, {
                     model: CuratorCourse,
                     include: {
                         model: User
@@ -79,7 +80,6 @@ class CourseController {
 
         return res.json(courses)
     }
-
 
 
     async savePage(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -128,7 +128,7 @@ class CourseController {
         try {
             await Course.update(
                 req.body,
-                { where: { id } }
+                {where: {id}}
             )
 
             res.status(201).json({

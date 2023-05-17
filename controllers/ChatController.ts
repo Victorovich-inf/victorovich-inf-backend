@@ -12,6 +12,15 @@ class ChatController {
             return;
         }
         try {
+            const existChat = await Chat.findOne({where: {user1Id: req.body.curatorId, user2Id: req.user.id}});
+
+            if (existChat) {
+                res.status(201).json({
+                    roomId: existChat.id,
+                });
+                return
+            }
+
             const chat = await Chat.create(
                 {user1Id: req.body.curatorId, user2Id: req.user.id},
             )

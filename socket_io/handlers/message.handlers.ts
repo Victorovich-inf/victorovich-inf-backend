@@ -1,4 +1,5 @@
 import {Message, User} from '../../models'
+import {removeFile} from "../../utils/file";
 
 const messages = {}
 
@@ -46,6 +47,19 @@ export default function messageHandlers(io, socket) {
         })
 
         messages[roomId]?.push(createdMessage)
+
+        updateMessageList()
+    })
+
+    socket.on('message:remove', async (message) => {
+        const {id, path} = message
+
+        await Message.destroy({where: {id}})
+
+        if (path)
+            await removeFile(path)
+
+        messages[roomId] = messages[roomId]?.filter((m) => m.id !== id)
 
         updateMessageList()
     })
