@@ -1,7 +1,7 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
-import {User} from '../models'
+import {User, Notification} from '../models'
 import {validationResult} from "express-validator";
 import {ApiError} from "../error/ApiError";
 import {generateMD5} from "../utils/generateHast";
@@ -26,6 +26,15 @@ class AuthController {
             res.status(201).json({
                 message: 'Пользователь удален'
             });
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async getNotifications(req: express.Request, res: express.Response) {
+        try {
+            const notifications = await Notification.findAll({where: {userId: req.user.id}, order: [['createdAt', 'DESC']]});
+            res.status(200).json(notifications);
         } catch (e) {
             console.log(e)
         }

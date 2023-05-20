@@ -1,4 +1,4 @@
-import {Message, User} from '../../models'
+import {Message, User, Notification} from '../../models'
 import {removeFile} from "../../utils/file";
 
 const messages = {}
@@ -44,6 +44,11 @@ export default function messageHandlers(io, socket) {
                     as: 'recipient'
                 }
             ],
+        })
+
+        await Notification.create({
+            userId: message.recipientId,
+            text: `${createdMessage.sender.firstName} ${createdMessage.sender.lastName} написал Вам сообщение`
         })
 
         messages[roomId]?.push(createdMessage)

@@ -25,15 +25,5 @@ export default function userHandlers(io, socket) {
         updateUserList()
     })
 
-    socket.on('disconnect', () => {
-        if (!users[roomId]) return
 
-        console.log('user disconnect ')
-
-        socket.to(roomId).emit('log', `User ${userName} disconnected`)
-
-        users[roomId] = users[roomId].filter((u) => u.socketId !== socket.id)
-
-        updateUserList()
-    })
 }

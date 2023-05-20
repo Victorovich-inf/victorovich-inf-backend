@@ -19,4 +19,7 @@ router.patch('/admin/:id/unban', passport.authenticate('jwt', { session: false }
 router.patch('/admin/:id/make-curator', passport.authenticate('jwt', { session: false }), AuthController.makeСurator);
 router.patch('/admin/:id/remove-curator', passport.authenticate('jwt', { session: false }), AuthController.removeСurator);
 
+
+router.get('/notifications', passport.authenticate('jwt', { session: false }), AuthController.getNotifications);
+
 export default router;

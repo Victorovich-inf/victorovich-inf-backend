@@ -22,6 +22,9 @@ module.exports = (sequelize, DataTypes) => {
     public: DataTypes.BOOLEAN,
     courseId: DataTypes.INTEGER,
     index: DataTypes.INTEGER,
+    discount: DataTypes.INTEGER,
+    start: DataTypes.DATE,
+    views: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Lesson',
