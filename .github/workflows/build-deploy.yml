@@ -2,7 +2,7 @@ name: Build and deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
     #Allow to run this workflow manually from the Actions tab in github
   workflow_dispatch:
