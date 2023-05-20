@@ -1,0 +1,10 @@
+- name: Docker login
+  docker_login:
+    registry: ghcr.io
+    username: victorovich-inf
+    password: "{{ lookup('env', 'DOCKER_CREDENTIALS') }}"
+
+- name: docker-compose up -d
+  docker_compose:
+    project_src: /services
+    pull: yes
