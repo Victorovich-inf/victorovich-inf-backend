@@ -1,0 +1,9 @@
+- name: Update frontend
+  hosts: victorovich
+
+  vars:
+    service: frontend
+
+  roles:
+    - { role: change-tag, become: yes }
+    - { role: docker-up, become: yes }

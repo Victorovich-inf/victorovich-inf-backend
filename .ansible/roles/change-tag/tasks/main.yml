@@ -1,0 +1,13 @@
+- name: Change frontend tag
+  replace:
+    path: "{{ docker.path }}"
+    regexp: "{{ services.regex.frontend }}"
+    replace: "{{ services.name.frontend }}:{{ lookup('env', 'IMAGE_VERSION') }}"
+  when: service == 'frontend'
+
+- name: Change backend tag
+  replace:
+    path: "{{ docker.path }}"
+    regexp: "{{ services.regex.backend }}"
+    replace: "{{ services.name.backend }}:{{ lookup('env', 'IMAGE_VERSION') }}"
+  when: service == 'backend'

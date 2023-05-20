@@ -1,0 +1,9 @@
+all:
+  children:
+    web:
+      hosts:
+        victorovich:
+          ansible_host: 45.12.72.14
+          ansible_port: 22
+          ansible_user: root
+          ansible_python_interpreter: /usr/bin/python3

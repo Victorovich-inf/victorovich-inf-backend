@@ -1,0 +1,11 @@
+docker:
+  registry: ghcr.io/victorovich-inf
+  path: /services/docker-compose.yml
+
+services:
+  name:
+    frontend: "victorovich-inf-frontend"
+    backend: "victorovich-inf-backend"
+  regex:
+    frontend: "victorovich-inf-frontend:?[A-Za-z0-9]+-[A-Za-z0-9]+"
+    backend: "victorovich-inf-backend:?[A-Za-z0-9]+-[A-Za-z0-9]+"
