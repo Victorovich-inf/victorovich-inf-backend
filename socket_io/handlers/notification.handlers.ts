@@ -14,7 +14,7 @@ export default function notificationHandlers(io, socket) {
 
 
         }
-    }, 5000);
+    }, 500000);
 
 
     socket.on('notification:remove', async (message) => {

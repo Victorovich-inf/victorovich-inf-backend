@@ -1,6 +1,11 @@
 import express from 'express';
 import {Course, Lesson, Task, Content, CourseUser, ProgressCourseUser, CuratorCourse, User} from '../models'
 import {validationResult} from "express-validator";
+import {
+    checkCompletedCourse, checkCompletedTheory,
+    checkCorrectlyCompletedTasksAndWinningStreak
+} from "../utils/achievements";
+import {upsertStatics} from "../utils/db";
 
 class BuyCourseController {
 
@@ -97,10 +102,31 @@ class BuyCourseController {
 
         try {
 
+            const courseUser = await CourseUser.findOne({
+                where: {
+                    userId: req.user.id,
+                    courseId: id
+                }
+            })
+
+            if (!courseUser) {
+                return res.status(404).json({
+                    message: 'Курс не найден'
+                })
+            }
+
             await ProgressCourseUser.update(
                 {data: req.body.data},
-                {where: {id}}
+                {where: {id: courseUser.id}}
             )
+
+            if (req.body?.answer) {
+                await checkCorrectlyCompletedTasksAndWinningStreak(id, req.user.id)
+            } else {
+                await checkCompletedTheory(id, req.user.id)
+            }
+
+            await checkCompletedCourse(req.body.data, id, req.user.id)
 
             res.status(201).json({
                 message: 'Прогресс сохранён',
@@ -109,6 +135,20 @@ class BuyCourseController {
             console.log(e)
             res.status(500).json({
                 message: 'Ошибка при покупке курса'
+            })
+        }
+    }
+    async resetWinningStreak(req: express.Request, res: express.Response) {
+        try {
+
+            await upsertStatics({winningStreak: 0, userId: req.user.id}, req.user.id)
+
+            res.status(201).json({
+                message: 'Прогресс сохранён',
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: 'Ошибка'
             })
         }
     }

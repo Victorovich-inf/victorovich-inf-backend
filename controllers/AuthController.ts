@@ -1,7 +1,7 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
-import {User, Notification} from '../models'
+import {User, Notification, Achievements, Statics} from '../models'
 import {validationResult} from "express-validator";
 import {ApiError} from "../error/ApiError";
 import {generateMD5} from "../utils/generateHast";
@@ -35,6 +35,20 @@ class AuthController {
         try {
             const notifications = await Notification.findAll({where: {userId: req.user.id}, order: [['createdAt', 'DESC']]});
             res.status(200).json(notifications);
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    async getAchievements(req: express.Request, res: express.Response) {
+        try {
+            const achievements = await Achievements.findOne({where: {userId: req.user.id}});
+            const statics = await Statics.findOne({where: {userId: req.user.id}});
+
+            res.status(200).json({
+                achievements,
+                statics
+            });
         } catch (e) {
             console.log(e)
         }

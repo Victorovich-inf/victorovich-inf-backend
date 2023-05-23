@@ -9,6 +9,8 @@ router.post('/:id', [passport.authenticate('jwt', {session: false})],
     BuyCourseController.buyCourse)
 router.put('/:id', [passport.authenticate('jwt', {session: false}), updateProgressValidations],
     BuyCourseController.updateProgress);
+router.delete('/reset', [passport.authenticate('jwt', {session: false})],
+    BuyCourseController.resetWinningStreak);
 router.get('/:id', [passport.authenticate('jwt', {session: false})], BuyCourseController.getOnePayment);
 
 export default router;

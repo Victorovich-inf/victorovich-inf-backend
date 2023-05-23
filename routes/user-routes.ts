@@ -21,5 +21,6 @@ router.patch('/admin/:id/remove-curator', passport.authenticate('jwt', { session
 
 
 router.get('/notifications', passport.authenticate('jwt', { session: false }), AuthController.getNotifications);
+router.get('/achievements', passport.authenticate('jwt', { session: false }), AuthController.getAchievements);
 
 export default router;
