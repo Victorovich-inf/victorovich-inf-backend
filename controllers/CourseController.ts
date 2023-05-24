@@ -237,7 +237,6 @@ class CourseController {
                     name: lessons[i].name,
                     public: lessons[i].public,
                     index: lessons[i].index,
-                    discount: lessons[i].discount,
                     start: lessons[i].start,
                     courseId: copyCourse.id,
                 }
@@ -341,7 +340,8 @@ class CourseController {
                 message: 'Курс добавлен',
                 data: course
             });
-        } catch {
+        } catch (e) {
+            console.log(e)
             res.status(500).json({
                 message: 'Ошибка при добавлении курса'
             })

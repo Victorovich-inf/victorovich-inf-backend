@@ -6,6 +6,7 @@ import {
     checkCorrectlyCompletedTasksAndWinningStreak
 } from "../utils/achievements";
 import {upsertStatics} from "../utils/db";
+import {buyCourseValidations} from "../validations/course/buyCourse";
 
 class BuyCourseController {
 
@@ -72,7 +73,7 @@ class BuyCourseController {
 
         try {
             const courseUser = await CourseUser.create(
-                {courseId: id, userId},
+                {courseId: id, userId, buyed: req.body.buyed},
             )
 
             await ProgressCourseUser.create(

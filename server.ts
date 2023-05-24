@@ -12,6 +12,7 @@ import taskRoutes from './routes/task-routes'
 import buyCourseRoutes from './routes/buy-course-routes'
 import curatorRoutes from './routes/curator-routes'
 import chatRoutes from './routes/chat-routes'
+import subscriptionRoutes from './routes/subscription-routes'
 import {Server} from 'socket.io'
 import { createServer } from 'http'
 import onConnection from "./socket_io/onConnection";
@@ -31,6 +32,7 @@ app.use('/task', taskRoutes);
 app.use('/buy-course', buyCourseRoutes);
 app.use('/curator', curatorRoutes);
 app.use('/chat', chatRoutes);
+app.use('/subscription', subscriptionRoutes);
 
 const server = createServer(app)
 

@@ -3,11 +3,10 @@ import {Strategy as LocalStrategy} from 'passport-local';
 import {Strategy as JWTstrategy, ExtractJwt} from 'passport-jwt';
 import {Strategy as VKontakteStrategy} from 'passport-vkontakte';
 import {Strategy as VKontakteStrategyRegister} from 'passport-vkontakte';
-import {User} from '../models';
+import {User, Subscription} from '../models';
 import {generateMD5} from '../utils/generateHast';
 import {UserModelInterface} from "../@types";
 import jwt from "jsonwebtoken";
-import {JSON} from "sequelize";
 
 passport.use('login', new LocalStrategy(
         {
@@ -17,6 +16,14 @@ passport.use('login', new LocalStrategy(
         async (username: string, password: string, done): Promise<void> => {
             try {
                 let user = await User.findOne({where: {email: username}, raw: true})
+
+                const subscription = await Subscription.findOne({where: {userId: user.id}})
+
+                if (subscription) {
+                    user.Subscription = subscription
+                } else {
+                    user.Subscription = null
+                }
 
                 if (!user) {
                     return done(null, false);
@@ -49,6 +56,14 @@ passport.use(
             id: string }, done): Promise<void> => {
             try {
                 const user = await User.findOne({where: {id: payload.data.id}, raw: true});
+
+                const subscription = await Subscription.findOne({where: {userId: user.id}})
+
+                if (subscription) {
+                    user.Subscription = subscription
+                } else {
+                    user.Subscription = null
+                }
 
                 if (user.banned) {
                     done(null, false);
@@ -87,6 +102,14 @@ passport.use('vkontakte-login',
                     },
                     raw: true
                 });
+
+                const subscription = await Subscription.findOne({where: {userId: findUser.id}})
+
+                if (subscription) {
+                    finduser.Subscription = subscription
+                } else {
+                    finduser.Subscription = null
+                }
 
                 if (!findUser) {
                     done(null, false);

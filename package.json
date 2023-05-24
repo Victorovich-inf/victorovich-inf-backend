@@ -8,7 +8,8 @@
     "nodemon": "nodemon",
     "migrate": "npx sequelize-cli db:migrate",
     "seeds": "npx sequelize-cli db:seed:all",
-    "generate": "npx sequelize-cli migration:generate"
+    "generate": "npx sequelize-cli migration:generate --name",
+    "generateModel": "npx sequelize-cli model:generate --name Subscription --attributes firstName:string"
   },
   "dependencies": {
     "@types/express": "^4.17.17",
@@ -19,6 +20,7 @@
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
+    "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
     "express": "~4.16.1",
     "express-validator": "^6.6.1",

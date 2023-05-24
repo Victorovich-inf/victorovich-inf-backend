@@ -26,6 +26,12 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Notification, {
         foreignKey: 'userId',
       })
+      User.hasMany(models.Achievements, {
+        foreignKey: 'userId',
+      })
+      User.hasOne(models.Subscription, {
+        foreignKey: 'userId',
+      })
     }
   }
   User.init({
