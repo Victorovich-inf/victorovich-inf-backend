@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node dist/server.js",
+    "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
     "nodemon": "nodemon",
     "migrate": "npx sequelize-cli db:migrate",
