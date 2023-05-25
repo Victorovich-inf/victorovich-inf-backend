@@ -46,7 +46,7 @@ jobs:
           cmd: install
 
       - name: Run build
-        uses: borales/actions-yarn@4
+        uses: borales/actions-yarn@v4
         with:
           cmd: build
 
