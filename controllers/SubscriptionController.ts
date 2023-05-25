@@ -2,7 +2,6 @@ import express from 'express';
 import {Subscription, User} from '../models'
 import {validationResult} from "express-validator";
 import dayjs from 'dayjs';
-import {upsertSubscription} from "../utils/db";
 
 class SubscriptionController {
 
@@ -18,12 +17,24 @@ class SubscriptionController {
             let start = dayjs().toString();
             let end = dayjs().add(+duration, 'month').toString()
 
-            await upsertSubscription({
+            const data = {
                 start: start,
                 end: end,
                 duration: duration,
                 userId: req.user.id,
-            }, req.user.id)
+            }
+
+            const userSub = await Subscription
+                .findOne({
+                    where: {userId: req.user.id},
+                    raw: true
+                })
+
+            if (userSub) {
+                await Subscription.update(data, {where: {userId: req.user.id}})
+            } else {
+                await Subscription.create(data)
+            }
 
             const user = await User.findOne({
                 where: {

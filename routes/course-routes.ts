@@ -25,7 +25,7 @@ router.post('/admin/upload', [passport.authenticate('jwt', {session: false}), up
     });
 })
 
-router.post('/query', [passport.authenticate('jwt', {session: false})],
+router.post('/query',
     CourseController.getAll);
 
 router.post('/admin/copy/:id', [passport.authenticate('jwt', {session: false}), adminMiddleware],

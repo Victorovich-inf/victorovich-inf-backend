@@ -7,6 +7,7 @@ import {User, Subscription} from '../models';
 import {generateMD5} from '../utils/generateHast';
 import {UserModelInterface} from "../@types";
 import jwt from "jsonwebtoken";
+import {checkActiveSubscription} from "../utils/date";
 
 passport.use('login', new LocalStrategy(
         {
@@ -17,10 +18,10 @@ passport.use('login', new LocalStrategy(
             try {
                 let user = await User.findOne({where: {email: username}, raw: true})
 
-                const subscription = await Subscription.findOne({where: {userId: user.id}})
+                const subscription = await Subscription.findOne({where: {userId: user.id}, raw: true})
 
                 if (subscription) {
-                    user.Subscription = subscription
+                    user.Subscription = {...subscription, active: checkActiveSubscription(subscription.end)}
                 } else {
                     user.Subscription = null
                 }
@@ -57,10 +58,10 @@ passport.use(
             try {
                 const user = await User.findOne({where: {id: payload.data.id}, raw: true});
 
-                const subscription = await Subscription.findOne({where: {userId: user.id}})
+                const subscription = await Subscription.findOne({where: {userId: user.id}, raw: true})
 
                 if (subscription) {
-                    user.Subscription = subscription
+                    user.Subscription = {...subscription, active: checkActiveSubscription(subscription.end)}
                 } else {
                     user.Subscription = null
                 }
@@ -103,12 +104,12 @@ passport.use('vkontakte-login',
                     raw: true
                 });
 
-                const subscription = await Subscription.findOne({where: {userId: findUser.id}})
+                const subscription = await Subscription.findOne({where: {userId: findUser.id}, raw: true})
 
                 if (subscription) {
-                    finduser.Subscription = subscription
+                    findUser.Subscription = {...subscription, active: checkActiveSubscription(subscription.end)}
                 } else {
-                    finduser.Subscription = null
+                    findUser.Subscription = null
                 }
 
                 if (!findUser) {
