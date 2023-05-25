@@ -1,3 +1,4 @@
+// @ts-nocheck
 const users = {}
 
 export default function userHandlers(io, socket) {

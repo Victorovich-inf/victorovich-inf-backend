@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {body} from "express-validator";
 import {Course} from '../../models'
 

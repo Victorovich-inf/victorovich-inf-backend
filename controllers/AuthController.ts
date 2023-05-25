@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from 'express';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';

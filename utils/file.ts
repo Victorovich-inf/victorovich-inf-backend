@@ -3,9 +3,9 @@ import { join } from 'path'
 
 const fileDir = join(__dirname, '..')
 
-export const getFilePath = (filePath) => join(fileDir, filePath)
+export const getFilePath = (filePath: any) => join(fileDir, filePath)
 
-export const removeFile = async (filePath) => {
+export const removeFile = async (filePath: any) => {
     try {
         await unlink(join(fileDir, filePath))
     } catch (e) {

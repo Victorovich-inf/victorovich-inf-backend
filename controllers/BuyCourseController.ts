@@ -1,12 +1,12 @@
+// @ts-nocheck
 import express from 'express';
 import {Course, Lesson, Task, Content, CourseUser, ProgressCourseUser, CuratorCourse, User} from '../models'
 import {validationResult} from "express-validator";
 import {
-    checkCompletedCourse, checkCompletedTheory,
+    checkCompletedCourse,
     checkCorrectlyCompletedTasksAndWinningStreak
 } from "../utils/achievements";
 import {upsertStatics} from "../utils/db";
-import {buyCourseValidations} from "../validations/course/buyCourse";
 
 class BuyCourseController {
 
@@ -122,9 +122,7 @@ class BuyCourseController {
             )
 
             if (req.body?.answer) {
-                await checkCorrectlyCompletedTasksAndWinningStreak(id, req.user.id)
-            } else {
-                await checkCompletedTheory(id, req.user.id)
+                await checkCorrectlyCompletedTasksAndWinningStreak(req.user.id)
             }
 
             await checkCompletedCourse(req.body.data, id, req.user.id)

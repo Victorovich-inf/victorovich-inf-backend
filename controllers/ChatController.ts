@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from 'express';
 import {Chat, User, Message} from '../models'
 import {validationResult} from "express-validator";

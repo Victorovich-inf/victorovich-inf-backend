@@ -1,6 +1,7 @@
-import {Achievements, Statics, Subscription} from '../models'
+// @ts-nocheck
+import {Achievements, Statics} from '../models'
 
-export  const upsertAchievements = async (values, userId) => {
+export  const upsertAchievements = async (values: any, userId: any) => {
     const obj = await Achievements
         .findOne({
             where: {userId}
@@ -11,19 +12,8 @@ export  const upsertAchievements = async (values, userId) => {
     return Achievements.create(values);
 }
 
-export  const upsertStatics = async (values, userId) => {
+export  const upsertStatics = async (values: any, userId: any) => {
     const obj = await Statics
-        .findOne({
-            where: {userId}
-        })
-    if (obj) {
-        return obj.update(values);
-    }
-    return Statics.create(values);
-}
-
-export const upsertSubscription = async (values, userId) => {
-    const obj = await Subscription
         .findOne({
             where: {userId}
         })

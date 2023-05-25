@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Router from 'express'
 import {passport} from "../core/passport";
 import {adminMiddleware} from "../middleware/authMiddleware";

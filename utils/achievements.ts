@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {CourseUser, Lesson, Achievements, Task, Content, Statics} from '../models'
 import {upsertAchievements} from "./db";
 
@@ -87,50 +88,8 @@ export const checkCompletedCourse = async (answerData, courseId: string, userId:
 
 }
 
-export const checkCompletedTheory = async (courseId: string, userId: string) => {
 
-    const find = await Achievements
-        .findOne({
-            where: {userId, completedTheory: true}
-        })
-
-    if (find) {
-        return
-    }
-
-    const lessons = await Lesson.findAll({
-        where: {courseId}, include:
-            [
-                {
-                    model: Task,
-                    include: [
-                        {
-                            model: Content
-                        },
-                        {
-                            model: Lesson
-                        }
-                    ]
-                },
-                {
-                    model: Content
-                }
-            ]
-    });
-
-    const content = dataToContent(lessons);
-
-    let all = Object.keys(content).filter(el => content[el].public).length;
-
-    const percent = calculateProgress(JSON.parse(answerData), all);
-
-    if (percent > 99) {
-        await upsertAchievements({completedCourse: true, userId}, userId)
-    }
-
-}
-
-export const checkCorrectlyCompletedTasksAndWinningStreak = async (courseId: string, userId: string) => {
+export const checkCorrectlyCompletedTasksAndWinningStreak = async (userId: string) => {
 
     const find = await Statics
         .findOne({

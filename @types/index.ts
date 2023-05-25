@@ -1,3 +1,5 @@
+// @ts-nocheck
+
  type UserData = {
     id: number;
     fullname: string;

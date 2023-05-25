@@ -1,0 +1,1 @@
+{"version":3,"file":"updateProgress.js","sourceRoot":"","sources":["../../../validations/course/updateProgress.ts"],"names":[],"mappings":";;;AAAA,yDAAuC;AAE1B,QAAA,yBAAyB,GAAG;IACrC,IAAA,wBAAI,EAAC,MAAM,EAAE,kBAAkB,CAAC;SAC3B,GAAG,EAAE;SACL,OAAO,EAAE;SACT,QAAQ,CAAC;QACN,GAAG,EAAE,CAAC;KACT,CAAC;CACT,CAAC"}

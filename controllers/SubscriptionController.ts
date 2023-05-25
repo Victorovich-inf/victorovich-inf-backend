@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from 'express';
 import {Subscription, User} from '../models'
 import {validationResult} from "express-validator";

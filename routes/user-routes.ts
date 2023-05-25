@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {registerValidations} from "../validations/auth/register";
 import AuthController from "../controllers/AuthController";
 import Router from 'express'

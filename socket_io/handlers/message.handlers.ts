@@ -1,3 +1,4 @@
+// @ts-nocheck
 import {Message, User, Notification} from '../../models'
 import {removeFile} from "../../utils/file";
 

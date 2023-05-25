@@ -8,9 +8,4 @@ type UserData = {
     banned: boolean;
 };
 
-declare global {
-    namespace Express {
-        interface User extends UserData {}
-    }
-}
 

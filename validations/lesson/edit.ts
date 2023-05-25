@@ -1,5 +1,4 @@
 import {body} from "express-validator";
-import {Course} from '../../models'
 
 export const editLessonValidations = [
     body('name', 'Введите название')

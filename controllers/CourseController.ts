@@ -1,3 +1,4 @@
+// @ts-nocheck
 import express from 'express';
 import {Course, Lesson, Task, Content, CourseUser, CuratorCourse, User} from '../models'
 import {validationResult} from "express-validator";

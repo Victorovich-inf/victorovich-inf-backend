@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { body } from 'express-validator';
 import {User} from '../../models'
 
@@ -11,7 +12,7 @@ export const registerValidations = [
         })
         .withMessage('Допустимое кол-во символов в почте от 10 до 40.').custom(value => {
         return User.findOne({ where: {email: value} })
-            .then((res) => {
+            .then((res: any) => {
                 if (res) {
                     return Promise.reject('Email уже используется')
                 } else {

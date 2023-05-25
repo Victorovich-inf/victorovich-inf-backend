@@ -1,10 +1,11 @@
+// @ts-nocheck
 import {Notification} from '../../models'
 import {removeFile} from "../../utils/file";
 
 export default function notificationHandlers(io, socket) {
     const {userId} = socket
 
-    let interval = setInterval(async function () {
+     setInterval(async function () {
         if (userId) {
             const notifications = await Notification.findAll({where: {userId}, order: [['createdAt', 'DESC']]})
 

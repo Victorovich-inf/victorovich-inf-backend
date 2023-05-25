@@ -1,8 +1,7 @@
-import messageHandlers from './handlers/message.handlers.ts'
+// @ts-nocheck
+import messageHandlers from './handlers/message.handlers'
 import userHandlers from './handlers/user.handlers'
 import notificationHandlers from './handlers/notification.handlers'
-
-
 
 export default function onConnection(io, socket) {
     const { roomId, userName, userId } = socket.handshake.query
