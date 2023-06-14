@@ -45,6 +45,11 @@ jobs:
         with:
           cmd: install
 
+      - name: Run build
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: build
+
       - name: Build and push docker container
         uses: docker/build-push-action@v3
         with:
