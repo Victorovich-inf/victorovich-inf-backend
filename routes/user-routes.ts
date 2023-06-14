@@ -18,10 +18,13 @@ router.patch('/admin/:id/ban', passport.authenticate('jwt', { session: false }),
 router.patch('/admin/:id/unban', passport.authenticate('jwt', { session: false }), AuthController.unban);
 
 router.patch('/admin/:id/make-curator', passport.authenticate('jwt', { session: false }), AuthController.makeСurator);
+router.patch('/admin/:id/make-admin', passport.authenticate('jwt', { session: false }), AuthController.makeAdmin);
 router.patch('/admin/:id/remove-curator', passport.authenticate('jwt', { session: false }), AuthController.removeСurator);
 
 
 router.get('/notifications', passport.authenticate('jwt', { session: false }), AuthController.getNotifications);
 router.get('/achievements', passport.authenticate('jwt', { session: false }), AuthController.getAchievements);
+router.patch('/profile', passport.authenticate('jwt', { session: false }), AuthController.updateProfile);
+router.patch('/password', passport.authenticate('jwt', { session: false }), AuthController.updatePassword);
 
 export default router;

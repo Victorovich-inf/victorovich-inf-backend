@@ -80,10 +80,9 @@ class TaskController {
                 )
             }
 
-            res.status(201).json({
-                message: 'Задача изменена',
-            });
-        } catch {
+            res.status(201).json();
+        } catch (e) {
+            console.log('e', e)
             res.status(500).json({
                 message: 'Ошибка при изменении задачи'
             })

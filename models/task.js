@@ -16,9 +16,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   Task.init({
     name: DataTypes.STRING,
-    answer: DataTypes.STRING,
+    answer: DataTypes.TEXT,
     prompt: DataTypes.STRING,
-    taskSolutionText: DataTypes.STRING,
+    taskSolutionText: DataTypes.TEXT,
     taskSolutionFile: DataTypes.STRING,
     lessonId: DataTypes.INTEGER,
     public: DataTypes.BOOLEAN,

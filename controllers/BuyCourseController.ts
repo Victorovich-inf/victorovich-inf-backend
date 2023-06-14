@@ -127,9 +127,7 @@ class BuyCourseController {
 
             await checkCompletedCourse(req.body.data, id, req.user.id)
 
-            res.status(201).json({
-                message: 'Прогресс сохранён',
-            });
+            res.status(201).json();
         } catch (e) {
             console.log(e)
             res.status(500).json({
@@ -142,9 +140,7 @@ class BuyCourseController {
 
             await upsertStatics({winningStreak: 0, userId: req.user.id}, req.user.id)
 
-            res.status(201).json({
-                message: 'Прогресс сохранён',
-            });
+            res.status(201).json();
         } catch (e) {
             res.status(500).json({
                 message: 'Ошибка'

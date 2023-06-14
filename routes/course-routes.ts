@@ -15,7 +15,7 @@ router.post('/admin/query', [passport.authenticate('jwt', {session: false}), adm
     CourseController.getAll);
 router.get('/admin/:id', [passport.authenticate('jwt', {session: false}), adminMiddleware], CourseController.getOne);
 router.put('/admin/:id/save', [passport.authenticate('jwt', {session: false}), adminMiddleware], CourseController.savePage);
-router.put('/admin/:id', [passport.authenticate('jwt', {session: false}), adminMiddleware, editLessonValidations], CourseController.edit);
+router.put('/admin/:id', [passport.authenticate('jwt', {session: false}), adminMiddleware, uploader.single('file')], CourseController.edit);
 router.delete('/admin/:id', [passport.authenticate('jwt', {session: false}), adminMiddleware], CourseController.delete);
 
 router.post('/admin/upload', [passport.authenticate('jwt', {session: false}), uploader.single('file')], (req: express.Request, res: express.Response) => {

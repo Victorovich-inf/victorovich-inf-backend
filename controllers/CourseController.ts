@@ -148,21 +148,23 @@ class CourseController {
         }
     }
 
-    async edit(req: express.Request, res: express.Response, next: express.NextFunction) {
-        const errors = validationResult(req);
+    async edit(req: express.Request, res: express.Response) {
+        const filePath = req?.file?.path;
 
         let {id} = req.params
 
-        if (!errors.isEmpty()) {
-            res.status(400).json(errors.array());
-            return;
-        }
-
         try {
-            await Course.update(
-                req.body,
-                {where: {id}}
-            )
+            if (filePath) {
+                await Course.update(
+                    {...req.body, logo: filePath},
+                    {where: {id}}
+                )
+            } else {
+                await Course.update(
+                    req.body,
+                    {where: {id}}
+                )
+            }
 
             res.status(201).json({
                 message: 'Курс изменён',

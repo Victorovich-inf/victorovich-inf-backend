@@ -32,6 +32,66 @@ class AuthController {
         }
     }
 
+    async updateProfile(req: express.Request, res: express.Response) {
+        try {
+            const errors = validationResult(req);
+
+            const userId = req.user.id;
+
+            if (!errors.isEmpty()) {
+                res.status(400).json(errors.array());
+                return;
+            }
+
+            await User.update({firstName: req.body.firstName, lastName: req.body.lastName}, {where: {id: userId}})
+
+            let user = {...req.user, firstName: req.body.firstName, lastName: req.body.lastName};
+
+            delete user['password'];
+
+            res.status(201).json({
+                message: 'Настройки сохранены',
+                user: user
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: 'Ошибка при сохранении профиля'
+            });
+        }
+    }
+
+    async updatePassword(req: express.Request, res: express.Response) {
+        try {
+            const errors = validationResult(req);
+
+            if (!errors.isEmpty()) {
+                res.status(400).json(errors.array());
+                return;
+            }
+
+            const oldPassword = generateMD5(req.body.oldPassword + process.env.SECRET_KEY)
+
+            const userId = req.user.id;
+
+            if (oldPassword !== req.user.password) {
+                return res.status(403).json({
+                    message: 'Пароли не совпадают',
+                })
+            }
+            const newPassword = generateMD5(req.body.newPassword + process.env.SECRET_KEY)
+
+            await User.update({password: newPassword}, {where: {id: userId}})
+
+            res.status(201).json({
+                message: 'Пароль изменён',
+            });
+        } catch (e) {
+            res.status(500).json({
+                message: 'Ошибка при изменении пароля'
+            });
+        }
+    }
+
     async getNotifications(req: express.Request, res: express.Response) {
         try {
             const notifications = await Notification.findAll({where: {userId: req.user.id}, order: [['createdAt', 'DESC']]});
@@ -132,6 +192,18 @@ class AuthController {
         }
     }
 
+    async makeAdmin(req: express.Request, res: express.Response) {
+        try {
+            let {id} = req.params
+            await User.update({role: 1}, {where: {id}})
+            res.status(201).json({
+                message: 'Пользователь назначен администратором'
+            });
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
     async removeСurator(req: express.Request, res: express.Response) {
         try {
             let {id} = req.params
@@ -166,6 +238,7 @@ class AuthController {
             attributes: {exclude: ['password']},
             distinct: true,
             where: {...filter},
+            order: [['id', 'ASC']],
             offset
         })
         return res.json(users)
