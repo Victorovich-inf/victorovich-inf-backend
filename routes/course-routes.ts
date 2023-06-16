@@ -6,6 +6,7 @@ import {uploader} from '../core/uploader';
 import CourseController from "../controllers/CourseController";
 import express from "express";
 import {editLessonValidations} from "../validations/lesson/edit";
+import AuthController from "../controllers/AuthController";
 
 const router = new Router()
 
@@ -17,6 +18,9 @@ router.get('/admin/:id', [passport.authenticate('jwt', {session: false}), adminM
 router.put('/admin/:id/save', [passport.authenticate('jwt', {session: false}), adminMiddleware], CourseController.savePage);
 router.put('/admin/:id', [passport.authenticate('jwt', {session: false}), adminMiddleware, uploader.single('file')], CourseController.edit);
 router.delete('/admin/:id', [passport.authenticate('jwt', {session: false}), adminMiddleware], CourseController.delete);
+router.post('/admin/add-user', [passport.authenticate('jwt', {session: false}), adminMiddleware], AuthController.addToCourse);
+router.post('/admin/edit-user', [passport.authenticate('jwt', {session: false}), adminMiddleware], AuthController.editUserCourse);
+router.delete('/admin/user/:id', [passport.authenticate('jwt', {session: false}), adminMiddleware], AuthController.deleteUserCourse);
 
 router.post('/admin/upload', [passport.authenticate('jwt', {session: false}), uploader.single('file')], (req: express.Request, res: express.Response) => {
     const filePath = req.file.path;
@@ -26,7 +30,7 @@ router.post('/admin/upload', [passport.authenticate('jwt', {session: false}), up
     });
 })
 
-router.post('/query',
+router.post('/query', [passport.authenticate('jwt', {session: false})],
     CourseController.getAll);
 
 router.post('/admin/copy/:id', [passport.authenticate('jwt', {session: false}), adminMiddleware],

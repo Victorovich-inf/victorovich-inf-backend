@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
         as: 'user2',
         foreignKey: 'user2Id',
       });
+      Chat.belongsTo(models.Course, {
+        onDelete: "CASCADE",
+        foreignKey: 'courseId',
+      });
       Chat.hasMany(models.Message, {
         foreignKey: 'chatId',
       })
@@ -22,7 +26,8 @@ module.exports = (sequelize, DataTypes) => {
   }
   Chat.init({
     user1Id: DataTypes.INTEGER,
-    user2Id: DataTypes.INTEGER
+    user2Id: DataTypes.INTEGER,
+    courseId: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'Chat',

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import express from 'express';
-import { Course, CuratorCourse, User} from '../models'
+import { Course, CuratorCourse, User, CourseUser} from '../models'
 import {validationResult} from "express-validator";
 
 class CuratorController {
@@ -46,6 +46,12 @@ class CuratorController {
         try {
             await CuratorCourse.create({
                 courseId,
+                userId: req.body.userId
+            })
+
+            await CourseUser.create({
+                courseId,
+                curator: true,
                 userId: req.body.userId
             })
 

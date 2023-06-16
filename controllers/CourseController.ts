@@ -30,6 +30,10 @@ class CourseController {
             let {id} = req.params
             const course = await Course.findOne({
                 where: {id},
+                order: [
+                    [ Lesson, 'index', 'ASC' ],
+                    [ Lesson, Task, 'index', 'ASC' ]
+                ],
                 include: [{
                     model: Lesson,
                     include: [
@@ -50,6 +54,11 @@ class CourseController {
                     ]
                 }, {
                     model: CuratorCourse,
+                    include: {
+                        model: User
+                    }
+                }, {
+                    model: CourseUser,
                     include: {
                         model: User
                     }
@@ -95,21 +104,51 @@ class CourseController {
 
     async getAll(req: express.Request, res: express.Response) {
         let {filter, paging} = req.body
+        const userId = req.user.id;
         let {skip, take} = paging
         let offset = skip
         let courses;
 
-        courses = await Course.findAndCountAll({
-            limit: take,
-            distinct: true,
-            where: {...filter},
-            include: [
-                {
-                    model: CourseUser,
-                }
-            ],
-            offset
-        })
+        if (Number(req.user.role) === 1) {
+            courses = await Course.findAndCountAll({
+                limit: take,
+                distinct: true,
+                where: {...filter},
+                include: [
+                    {
+                        model: CourseUser,
+                    }
+                ],
+                offset
+            })
+        } else if (Number(req.user.role) === 2) {
+            courses = await Course.findAndCountAll({
+                limit: take,
+                distinct: true,
+                where: {...filter},
+                include: [
+                    {
+                        model: CourseUser,
+                        where: {curator: true, userId}
+                    }
+                ],
+                offset
+            })
+        } else {
+            courses = await Course.findAndCountAll({
+                limit: take,
+                distinct: true,
+                where: {...filter},
+                include: [
+                    {
+                        model: CourseUser,
+                        where: {userId, completed: true}
+                    }
+                ],
+                offset
+            })
+        }
+
 
         return res.json(courses)
     }
@@ -182,7 +221,7 @@ class CourseController {
 
         try {
             let course = await Course.findOne({
-                where: { id},
+                where: {id},
                 raw: true,
             });
 
@@ -281,7 +320,6 @@ class CourseController {
                 }
 
             }
-
 
 
             res.status(201).json({

@@ -35,7 +35,7 @@ passport.use('login', new LocalStrategy(
                     done(null, false);
                 }
 
-                if (!user.confirmationCode && user.password === generateMD5(password + process.env.SECRET_KEY)) {
+                if (user.password === generateMD5(password + process.env.SECRET_KEY)) {
                     done(null, user);
                 } else {
                     done(null, false);

@@ -15,6 +15,10 @@ class BuyCourseController {
             let {id} = req.params
             const course = await Course.findOne({
                 where: {id},
+                order: [
+                    [ Lesson, 'index', 'ASC' ],
+                    [ Lesson, Task, 'index', 'ASC' ]
+                ],
                 include: [
                     {
                         model: Lesson,

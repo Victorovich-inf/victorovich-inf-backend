@@ -6,7 +6,7 @@ export const uploader = multer({
             cb(null, 'static');
         },
         filename: function (_, file, cb) {
-            cb(null, file.fieldname + '-' + (Math.random() + 1).toString(36).substring(7) + '.' + file.originalname.split('.')[1]);
+            cb(null, file.fieldname + '-' + (Math.random() + 1).toString(36).substring(7) + '.' + file.originalname.split('.').slice(-1)[0]);
         },
     }),
 });

@@ -29,4 +29,12 @@ export default function notificationHandlers(io, socket) {
             notifications
         });
     })
+
+    socket.on('notification:clear', async () => {
+        await Notification.destroy({where: {userId}})
+
+        socket.emit("notification", {
+            notifications: []
+        });
+    })
 }

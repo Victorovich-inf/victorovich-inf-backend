@@ -37,7 +37,8 @@ class TaskController {
         try {
             const data = await Task.create({
                 name: req.body.name,
-                lessonId: req.body.lessonId
+                lessonId: req.body.lessonId,
+                index: Number(req.body.maxIndex) || 0
             })
 
             const taskId = data.id;

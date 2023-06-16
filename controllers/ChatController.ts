@@ -23,7 +23,7 @@ class ChatController {
             }
 
             const chat = await Chat.create(
-                {user1Id: req.body.curatorId, user2Id: req.user.id},
+                {user1Id: req.body.curatorId, user2Id: req.user.id, courseId: req.body.courseId},
             )
             res.status(201).json({
                 roomId: chat.id,

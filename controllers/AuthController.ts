@@ -2,7 +2,7 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
-import {User, Notification, Achievements, Statics} from '../models'
+import {User, Notification, Achievements, Statics, CourseUser} from '../models'
 import {validationResult} from "express-validator";
 import {ApiError} from "../error/ApiError";
 import {generateMD5} from "../utils/generateHast";
@@ -94,7 +94,10 @@ class AuthController {
 
     async getNotifications(req: express.Request, res: express.Response) {
         try {
-            const notifications = await Notification.findAll({where: {userId: req.user.id}, order: [['createdAt', 'DESC']]});
+            const notifications = await Notification.findAll({
+                where: {userId: req.user.id},
+                order: [['createdAt', 'DESC']]
+            });
             res.status(200).json(notifications);
         } catch (e) {
             console.log(e)
@@ -244,6 +247,104 @@ class AuthController {
         return res.json(users)
     }
 
+    async addToCourse(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const errors = validationResult(req);
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.MAIL,
+                pass: process.env.PASS
+            }
+        });
+
+        if (!errors.isEmpty()) {
+            res.status(400).json(errors.array());
+            return;
+        }
+
+        const randomStr = Math.random().toString();
+
+        const confirmationCode = generateMD5(process.env.SECRET_KEY + randomStr || randomStr)
+
+        try {
+
+            const find = await User.findOne({where: {email: req.body.email}})
+
+            if (find) {
+                await CourseUser.create({
+                    userId: find.id,
+                    courseId: req.body.courseId,
+                    end: req.body.end,
+                });
+                await find.update({confirmationCode});
+            } else {
+                const createdUser = await User.create({
+                    email: req.body.email,
+                    confirmationCode
+                });
+
+                await CourseUser.create({
+                    userId: createdUser.id,
+                    courseId: req.body.courseId,
+                    end: req.body.end,
+                });
+            }
+
+            transporter.sendMail({
+                from: process.env.MAIL,
+                to: req.body.email,
+                subject: "Приглашение на курс",
+                html: `<h1>Приглашение на курс</h1>
+        <h2>Привет</h2>
+        <p>Для получения доступа к курсу перейдите по ссылке !</p>
+        <a href=${process.env.FRONT_URL}/auth/register?t=${confirmationCode}&course=${req.body.courseId}> Перейти</a>
+        </div>`,
+            }).catch(() => next(ApiError.internal('Ошибка при отправке email')))
+
+            res.status(201).json({
+                message: 'Пользователь добавлен на курс'
+            });
+        } catch {
+            return next(ApiError.internal('Ошибка при создании пользователя'))
+        }
+    }
+
+    async editUserCourse(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            res.status(400).json(errors.array());
+            return;
+        }
+
+        try {
+            const find = await CourseUser.findOne({where: {userId: req.body.userId, courseId: req.body.courseId}})
+
+            await find.update({end: req.body.end});
+
+            res.status(201).json({
+                message: 'Сохранено'
+            });
+        } catch {
+            return next(ApiError.internal('Ошибка при создании пользователя'))
+        }
+    }
+
+    async deleteUserCourse(req: express.Request, res: express.Response, next: express.NextFunction) {
+        let {id} = req.params
+
+        try {
+            await CourseUser.destroy({where: {userId: req.body.userId, courseId: id}})
+
+            res.status(201).json({
+                message: 'Сохранено'
+            });
+        } catch {
+            return next(ApiError.internal('Ошибка при создании пользователя'))
+        }
+    }
+
     async register(req: express.Request, res: express.Response, next: express.NextFunction) {
         const errors = validationResult(req);
 
@@ -267,7 +368,8 @@ class AuthController {
         try {
             await User.create({
                 email: req.body.email,
-                confirmationCode
+                confirmationCode,
+                role: 2
             });
 
             transporter.sendMail({
@@ -312,12 +414,24 @@ class AuthController {
                 password: generateMD5(req.body.password + process.env.SECRET_KEY),
             };
 
+            const courseUser = await CourseUser.findOne({where: {userId: user.id, courseId: req.body.course}})
+
+            if (user.role !== 2) {
+                if (!courseUser) {
+                    return res.status(404).json({
+                        message: 'У вас нет приглашений на курсы',
+                    })
+                } else {
+                    await courseUser.update({completed: true})
+                }
+            }
+
             await User.update(data, {where: {confirmationCode: req.body.token}})
 
             let userData = user;
             delete userData['password']
 
-            res.json({
+            return res.json({
                 user: {
                     ...userData
                 },
@@ -325,7 +439,55 @@ class AuthController {
                     expiresIn: '30 days',
                 }),
             });
-        } catch {
+        } catch (e) {
+            console.log(e)
+            return next(ApiError.internal('Ошибка при создании пользователя'))
+        }
+    }
+
+    async hasAccount(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const errors = validationResult(req);
+
+        if (!errors.isEmpty()) {
+            res.status(400).json({status: 'error', errors: errors.array()});
+            return;
+        }
+
+        try {
+            const user = await User.findOne({where: {confirmationCode: req.body.token}, raw: true})
+
+            if (!user) {
+                return next(ApiError.internal('Неверный токен!'))
+            }
+
+            const courseUser = await CourseUser.findOne({where: {userId: user.id, courseId: req.body.course}})
+
+            if (!courseUser && user.role === 0) {
+                return res.status(500).json()
+            }
+
+            if (user.password) {
+                let userData = user;
+                delete userData['password']
+
+                await User.update({confirmationCode: null}, {where: {confirmationCode: req.body.token}})
+
+                await courseUser.update({completed: true})
+
+                return res.json({
+                    user: {
+                        ...userData
+                    },
+                    token: jwt.sign({data: userData}, process.env.SECRET_KEY || '123', {
+                        expiresIn: '30 days',
+                    }),
+                })
+            } else {
+                return res.status(404).json()
+            }
+
+        } catch (e) {
+            console.log(e)
             return next(ApiError.internal('Ошибка при создании пользователя'))
         }
     }

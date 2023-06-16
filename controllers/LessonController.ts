@@ -38,7 +38,8 @@ class LessonController {
 
             const data = await Lesson.create({
                 name: req.body.name,
-                courseId: req.body.courseId
+                courseId: req.body.courseId,
+                index: Number(req.body.maxIndex) || 0
             })
 
             const lessonId = data.id;

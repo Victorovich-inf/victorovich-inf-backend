@@ -6,6 +6,7 @@ import {passport} from "../core/passport";
 const router = new Router()
 
 router.post('/complete', completeValidations, AuthController.complete);
+router.post('/has-account', AuthController.hasAccount);
 router.post('/login', passport.authenticate('login'), AuthController.afterLogin);
 router.get('/check', passport.authenticate('jwt', { session: false }), AuthController.afterLogin);
 
