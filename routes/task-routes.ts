@@ -9,6 +9,13 @@ import {uploader} from "../core/uploader";
 
 const router = new Router()
 
+
+router.post('/answer-file/', [passport.authenticate('jwt', { session: false })],
+    TaskController.answerFile);
+
+router.post('/answer-file-again/', [passport.authenticate('jwt', { session: false })],
+    TaskController.answerFileAgain);
+
 router.post('/admin/', [passport.authenticate('jwt', { session: false }), adminMiddleware, createTaskValidations],
     TaskController.create);
 router.delete('/admin/:id', [passport.authenticate('jwt', { session: false }), adminMiddleware], TaskController.delete);

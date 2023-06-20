@@ -1,6 +1,6 @@
 // @ts-nocheck
 import express from 'express';
-import {Task, Lesson, Content} from '../models'
+import {Task, Lesson, Content, TaskAnswerFile} from '../models'
 import {validationResult} from "express-validator";
 
 class TaskController {
@@ -26,7 +26,7 @@ class TaskController {
             return;
         }
 
-        const lesson = Lesson.findOne({where: {id: req.body.lessonId}})
+        const lesson = await Lesson.findOne({where: {id: req.body.lessonId}})
 
         if (!lesson) {
             res.status(404).json({
@@ -57,6 +57,65 @@ class TaskController {
         }
     }
 
+
+    async answerFile(req: express.Request, res: express.Response) {
+        const task = await Task.findOne({where: {id: req.body.taskId}})
+
+        if (!task) {
+            return res.status(404).json({
+                message: 'Задача не найдена'
+            })
+        }
+
+        try {
+
+            await TaskAnswerFile.create({
+                taskId: req.body.taskId,
+                userId: req.user.id,
+                link: req.body.link,
+            })
+
+            res.status(201).json({
+                message: 'Ответ отправлен на проверку куратору',
+            });
+        } catch {
+            res.status(500).json({
+                message: 'Ошибка при загрузке ответа'
+            })
+        }
+    }
+
+    async answerFileAgain(req: express.Request, res: express.Response) {
+        const task = await Task.findOne({where: {id: req.body.taskId}})
+
+        if (!task) {
+            return res.status(404).json({
+                message: 'Задача не найдена'
+            })
+        }
+
+        try {
+
+            const taskAnswerFile = await TaskAnswerFile.findOne({
+                where: {
+                    taskId: req.body.taskId,
+                    userId: req.user.id,
+                }
+            })
+
+            await taskAnswerFile.update({wrong: false, link: req.body.link});
+
+            res.status(201).json({
+                message: 'Ответ ещё раз отправлен на проверку куратору',
+            });
+        } catch {
+            res.status(500).json({
+                message: 'Ошибка при загрузке ответа'
+            })
+        }
+    }
+
+
     async edit(req: express.Request, res: express.Response) {
         const errors = validationResult(req);
         const filePath = req?.file?.path;
@@ -72,12 +131,12 @@ class TaskController {
             if (filePath) {
                 await Task.update(
                     {...req.body, taskSolutionFile: filePath},
-                    { where: { id } }
+                    {where: {id}}
                 )
             } else {
                 await Task.update(
                     req.body,
-                    { where: { id } }
+                    {where: {id}}
                 )
             }
 
@@ -89,7 +148,6 @@ class TaskController {
             })
         }
     }
-
 
 
 }

@@ -12,6 +12,9 @@ module.exports = (sequelize, DataTypes) => {
       Task.hasOne(models.Content, {
         foreignKey: 'taskId',
       })
+      Task.hasMany(models.TaskAnswerFile, {
+        foreignKey: 'taskId',
+      })
     }
   }
   Task.init({

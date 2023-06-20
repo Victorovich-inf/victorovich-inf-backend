@@ -10,7 +10,10 @@ const router = new Router()
 router.post('/:id', [passport.authenticate('jwt', {session: false}), buyCourseValidations],
     BuyCourseController.buyCourse)
 router.put('/:id', [passport.authenticate('jwt', {session: false}), updateProgressValidations],
-    BuyCourseController.updateProgress);
+    BuyCourseController.updateProgress)
+
+router.patch('/curator-check/', [passport.authenticate('jwt', {session: false})],
+    BuyCourseController.updateProgressCurator);
 router.delete('/reset', [passport.authenticate('jwt', {session: false})],
     BuyCourseController.resetWinningStreak);
 router.get('/:id', [passport.authenticate('jwt', {session: false})], BuyCourseController.getOnePayment);
