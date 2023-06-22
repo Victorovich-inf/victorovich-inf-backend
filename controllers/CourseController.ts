@@ -1,6 +1,6 @@
 // @ts-nocheck
 import express from 'express';
-import {Course, Lesson, Task, Content, CourseUser, CuratorCourse, User} from '../models'
+import {Course, Lesson, Task, Content, CourseUser, ProgressCourseUser, CuratorCourse, User} from '../models'
 import {validationResult} from "express-validator";
 import {Content as ContentType} from "../@types";
 import {removeFile} from "../utils/file";
@@ -64,6 +64,7 @@ class CourseController {
                     }
                 }]
             });
+
             res.status(200).json(course);
         } catch (e) {
             console.log(e)
@@ -352,6 +353,14 @@ class CourseController {
                 logo: filePath,
                 free: req.body.free,
             });
+
+            const courseUser = await CourseUser.create(
+                {courseId: course.id, userId: req.user.id},
+            )
+
+            await ProgressCourseUser.create(
+                {courseUserId: courseUser.id},
+            )
 
             const courseId = course.id;
 

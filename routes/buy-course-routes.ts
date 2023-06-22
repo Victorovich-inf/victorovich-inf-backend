@@ -7,8 +7,6 @@ import {buyCourseValidations} from "../validations/course/buyCourse";
 
 const router = new Router()
 
-router.post('/:id', [passport.authenticate('jwt', {session: false}), buyCourseValidations],
-    BuyCourseController.buyCourse)
 router.put('/:id', [passport.authenticate('jwt', {session: false}), updateProgressValidations],
     BuyCourseController.updateProgress)
 

@@ -95,7 +95,7 @@ class BuyCourseController {
 
         try {
             const courseUser = await CourseUser.create(
-                {courseId: id, userId, buyed: req.body.buyed},
+                {courseId: id, userId},
             )
 
             await ProgressCourseUser.create(
