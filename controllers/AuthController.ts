@@ -323,7 +323,7 @@ class AuthController {
 
                 await ProgressCourseUser.create({
                     courseUserId: courseUser.id,
-                    userId: find.id,
+                    userId: createdUser.id,
                     courseId: req.body.courseId,
                 })
             }
