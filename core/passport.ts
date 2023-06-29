@@ -19,14 +19,6 @@ passport.use('login', new LocalStrategy(
             try {
                 let user = await User.findOne({where: {email: username}, raw: true})
 
-                const subscription = await Subscription.findOne({where: {userId: user.id}, raw: true})
-
-                if (subscription) {
-                    user.Subscription = {...subscription, active: checkActiveSubscription(subscription.end)}
-                } else {
-                    user.Subscription = null
-                }
-
                 if (!user) {
                     return done(null, false);
                 }
@@ -58,14 +50,6 @@ passport.use(
             id: string }, done): Promise<void> => {
             try {
                 const user = await User.findOne({where: {id: payload.data.id}, raw: true});
-
-                const subscription = await Subscription.findOne({where: {userId: user.id}, raw: true})
-
-                if (subscription) {
-                    user.Subscription = {...subscription, active: checkActiveSubscription(subscription.end)}
-                } else {
-                    user.Subscription = null
-                }
 
                 if (user.banned) {
                     done(null, false);
@@ -104,14 +88,6 @@ passport.use('vkontakte-login',
                     },
                     raw: true
                 });
-
-                const subscription = await Subscription.findOne({where: {userId: findUser.id}, raw: true})
-
-                if (subscription) {
-                    findUser.Subscription = {...subscription, active: checkActiveSubscription(subscription.end)}
-                } else {
-                    findUser.Subscription = null
-                }
 
                 if (!findUser) {
                     done(null, false);
