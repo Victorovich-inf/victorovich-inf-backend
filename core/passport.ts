@@ -89,6 +89,8 @@ passport.use('vkontakte-login',
                     raw: true
                 });
 
+                console.log('findUser', findUser)
+
                 if (!findUser) {
                     done(null, false);
                 } else {
