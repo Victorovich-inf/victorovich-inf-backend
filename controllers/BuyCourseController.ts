@@ -81,37 +81,6 @@ class BuyCourseController {
     }
 
 
-    async buyCourse(req: express.Request, res: express.Response) {
-        const errors = validationResult(req);
-
-        let {id} = req.params
-
-        const userId = req.user.id;
-
-        if (!errors.isEmpty()) {
-            res.status(400).json(errors.array());
-            return;
-        }
-
-        try {
-            const courseUser = await CourseUser.create(
-                {courseId: id, userId},
-            )
-
-            await ProgressCourseUser.create(
-                {courseUserId: courseUser.id},
-            )
-
-            res.status(201).json({
-                message: 'Курс приобретён',
-            });
-        } catch {
-            res.status(500).json({
-                message: 'Ошибка при покупке курса'
-            })
-        }
-    }
-
     async updateProgress(req: express.Request, res: express.Response) {
         const errors = validationResult(req);
 
@@ -138,10 +107,19 @@ class BuyCourseController {
                 })
             }
 
-            await ProgressCourseUser.update(
-                {data: req.body.data},
-                {where: {id: courseUser.id}}
-            )
+            const obj = await ProgressCourseUser
+                .findOne({
+                    where: {courseUserId: courseUser.id}
+                })
+
+            if (obj) {
+                obj.update({data: req.body.data});
+            } else {
+                await ProgressCourseUser.create(
+                    {data: req.body.data, courseUserId: courseUser.id},
+                    {where: {courseUserId: courseUser.id}}
+                )
+            }
 
             if (req.body?.answer) {
                 await checkCorrectlyCompletedTasksAndWinningStreak(req.user.id)

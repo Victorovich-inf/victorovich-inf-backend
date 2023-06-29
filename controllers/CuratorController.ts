@@ -7,9 +7,11 @@ class CuratorController {
 
     async deleteFromCourse(req: express.Request, res: express.Response) {
         try {
-            let {id} = req.params
+            let {id, courseId, userId} = req.body
 
             await CuratorCourse.destroy({where: {id}});
+            await CourseUser.destroy({where: {courseId, userId}});
+
             res.status(201).json({
                 message: 'Куратор удалён из курса'
             });

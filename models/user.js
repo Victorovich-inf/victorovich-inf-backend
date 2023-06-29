@@ -35,6 +35,9 @@ module.exports = (sequelize, DataTypes) => {
       User.hasOne(models.Subscription, {
         foreignKey: 'userId',
       })
+      User.hasMany(models.ProgressCourseUser, {
+        foreignKey: 'userId',
+      })
     }
   }
   User.init({
@@ -45,6 +48,7 @@ module.exports = (sequelize, DataTypes) => {
     role: DataTypes.INTEGER,
     banned: DataTypes.BOOLEAN,
     confirmationCode: DataTypes.STRING,
+    resetCode: DataTypes.STRING,
     vkId: DataTypes.STRING,
   }, {
     sequelize,

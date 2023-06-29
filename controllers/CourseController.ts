@@ -32,7 +32,8 @@ class CourseController {
                 where: {id},
                 order: [
                     [ Lesson, 'index', 'ASC' ],
-                    [ Lesson, Task, 'index', 'ASC' ]
+                    [ Lesson, Task, 'index', 'ASC' ],
+                    [ CourseUser, User, 'lastName', 'ASC' ]
                 ],
                 include: [{
                     model: Lesson,
@@ -74,9 +75,18 @@ class CourseController {
     async getScheduleOfLessons(req: express.Request, res: express.Response) {
         try {
             let userId = req.user.id
-            const coursesUser = await CourseUser.findAll({
-                where: {userId},
-            });
+
+            let coursesUser;
+
+            if (req.user.role === 2) {
+                coursesUser = await CourseUser.findAll({
+                    where: {userId, completed: true},
+                });
+            } else {
+                coursesUser = await CourseUser.findAll({
+                    where: {userId},
+                });
+            }
 
             const courseIds = coursesUser.map(el => el.courseId);
 

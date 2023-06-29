@@ -49,6 +49,9 @@ class ChatController {
                 {
                     model: User,
                     as: 'user2'
+                },
+                {
+                    model: Message,
                 }
             ],
             where: {

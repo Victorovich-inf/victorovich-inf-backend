@@ -9,10 +9,20 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: "CASCADE",
         foreignKey: 'courseUserId',
       });
+      ProgressCourseUser.belongsTo(models.Course, {
+        onDelete: "CASCADE",
+        foreignKey: 'courseId',
+      });
+      ProgressCourseUser.belongsTo(models.User, {
+        onDelete: "CASCADE",
+        foreignKey: 'userId',
+      });
     }
   }
   ProgressCourseUser.init({
     courseUserId: DataTypes.INTEGER,
+    userId: DataTypes.INTEGER,
+    courseId: DataTypes.INTEGER,
     data: DataTypes.JSON
   }, {
     sequelize,

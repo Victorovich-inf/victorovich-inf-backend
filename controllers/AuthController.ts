@@ -2,7 +2,8 @@
 import express from 'express';
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
-import {User, Notification, Achievements, Statics, CourseUser} from '../models'
+import {Op} from "sequelize";
+import {User, Notification, Achievements, Statics, CourseUser, ProgressCourseUser} from '../models'
 import {validationResult} from "express-validator";
 import {ApiError} from "../error/ApiError";
 import {generateMD5} from "../utils/generateHast";
@@ -233,14 +234,25 @@ class AuthController {
 
     async getAll(req: express.Request, res: express.Response) {
         let {filter, paging} = req.body
+        let filterBody = {...filter}
         let {skip, take} = paging
         let offset = skip
         let users;
+
+        if (filter) {
+            if (filter.hasOwnProperty('lastName')) {
+                filterBody['lastName'] = {
+                    [Op.like]: `${filterBody['lastName']}%`,
+                }
+            }
+        }
+
+
         users = await User.findAndCountAll({
             limit: take,
             attributes: {exclude: ['password']},
             distinct: true,
-            where: {...filter},
+            where: {...filterBody},
             order: [['id', 'ASC']],
             offset
         })
@@ -272,23 +284,48 @@ class AuthController {
             const find = await User.findOne({where: {email: req.body.email}})
 
             if (find) {
-                await CourseUser.create({
+                const courseUser = await CourseUser.create({
                     userId: find.id,
                     courseId: req.body.courseId,
                     end: req.body.end,
                 });
+
+                const progress = await ProgressCourseUser.findOne({
+                    where: {
+                        userId: find.id,
+                        courseId: req.body.courseId,
+                    }
+                })
+
+                if (progress) {
+                    await progress.update({courseUserId: courseUser.id});
+                } else {
+                    await ProgressCourseUser.create({
+                        courseUserId: courseUser.id,
+                        userId: find.id,
+                        courseId: req.body.courseId,
+                    })
+                }
+
                 await find.update({confirmationCode});
             } else {
+
                 const createdUser = await User.create({
                     email: req.body.email,
                     confirmationCode
                 });
 
-                await CourseUser.create({
+                const courseUser = await CourseUser.create({
                     userId: createdUser.id,
                     courseId: req.body.courseId,
                     end: req.body.end,
                 });
+
+                await ProgressCourseUser.create({
+                    courseUserId: courseUser.id,
+                    userId: find.id,
+                    courseId: req.body.courseId,
+                })
             }
 
             transporter.sendMail({
@@ -340,7 +377,8 @@ class AuthController {
             res.status(201).json({
                 message: 'Сохранено'
             });
-        } catch {
+        } catch (e) {
+            console.log(e)
             return next(ApiError.internal('Ошибка при создании пользователя'))
         }
     }
@@ -390,6 +428,85 @@ class AuthController {
             return next(ApiError.internal('Ошибка при создании пользователя'))
         }
     }
+
+
+    async reset(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const errors = validationResult(req);
+
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: process.env.MAIL,
+                pass: process.env.PASS
+            }
+        });
+
+        if (!errors.isEmpty()) {
+            res.status(400).json(errors.array());
+            return;
+        }
+
+        const randomStr = Math.random().toString();
+
+        const resetCode = generateMD5(process.env.SECRET_KEY + randomStr || randomStr)
+
+        try {
+            const user = await User.findOne({
+                where: {email: req.body.email}
+            });
+
+
+            if (!user) {
+                return res.status(500).json({
+                    message: 'Email не найден'
+                })
+            }
+
+            await user.update({resetCode});
+
+            transporter.sendMail({
+                from: process.env.MAIL,
+                to: req.body.email,
+                subject: "Восстановление пароля",
+                html: `<h1>Восстановление пароля</h1>
+        <h2>Привет</h2>
+        <p>Чтобы задать новый пароль перейдите по ссылке !</p>
+        <a href=${process.env.FRONT_URL}/auth/confirm?t=${resetCode}> Перейти</a>
+        </div>`,
+            }).catch(() => next(ApiError.internal('Ошибка при отправке email')));
+
+            res.status(201).json({
+                message: 'Инструкция отправлена на почту'
+            });
+        } catch {
+            return next(ApiError.internal('Ошибка при создании пользователя'))
+        }
+    }
+
+    async confirm(req: express.Request, res: express.Response, next: express.NextFunction) {
+        const newPassword = generateMD5(req.body.password + process.env.SECRET_KEY)
+
+        try {
+            const obj = await User.findOne({where: {resetCode: req.body.token}, distinct: true})
+
+            await User.update({password: newPassword, resetCode: null}, {where: {resetCode: req.body.token}})
+
+            let user = obj;
+            delete user['password']
+
+            res.json({
+                user: {
+                    ...user
+                },
+                token: jwt.sign({data: user}, process.env.SECRET_KEY || '123', {
+                    expiresIn: '30 days',
+                }),
+            });
+        } catch (e) {
+            return next(ApiError.internal('Ошибка при создании пользователя'))
+        }
+    }
+
 
     async complete(req: express.Request, res: express.Response, next: express.NextFunction) {
         const errors = validationResult(req);
