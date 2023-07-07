@@ -49,7 +49,7 @@ module.exports = (sequelize, DataTypes) => {
     banned: DataTypes.BOOLEAN,
     confirmationCode: DataTypes.STRING,
     resetCode: DataTypes.STRING,
-    vkId: DataTypes.STRING,
+    vkId: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'User',

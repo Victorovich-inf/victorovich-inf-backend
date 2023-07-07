@@ -23,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     buyed: DataTypes.BOOLEAN,
     curator: DataTypes.BOOLEAN,
+    hasCurator: DataTypes.BOOLEAN,
     end: DataTypes.DATE,
     completed: DataTypes.BOOLEAN,
     admin: DataTypes.BOOLEAN,

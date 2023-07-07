@@ -1,6 +1,6 @@
 // @ts-nocheck
 import express from 'express';
-import {Task, Lesson, Content, TaskAnswerFile} from '../models'
+import {Task, Lesson, Content, Course, Notification, TaskAnswerFile, CuratorCourse} from '../models'
 import {validationResult} from "express-validator";
 
 class TaskController {
@@ -75,10 +75,28 @@ class TaskController {
                 link: req.body.link,
             })
 
+            const lesson = await Lesson.findOne({where: {id: task.lessonId}, include: {
+                    model: Course
+                }})
+
+            const curators = await CuratorCourse.findAll({where: {courseId: lesson.courseId}});
+
+            const ids = curators.map(el => el.userId);
+
+            for (let i = 0; i < ids.length; i++) {
+                const userId = ids[i];
+
+                await Notification.create({
+                    userId: userId,
+                    text: `Ученик отправил на проверку файл в курсе "${lesson.Course.name}"`
+                })
+            }
+
             res.status(201).json({
                 message: 'Ответ отправлен на проверку куратору',
             });
-        } catch {
+        } catch (e) {
+            console.log(e)
             res.status(500).json({
                 message: 'Ошибка при загрузке ответа'
             })
@@ -102,6 +120,23 @@ class TaskController {
                     userId: req.user.id,
                 }
             })
+
+            const lesson = await Lesson.findOne({where: {id: task.lessonId}, include: {
+                    model: Course
+                }})
+
+            const curators = await CuratorCourse.findAll({where: {courseId: lesson.courseId}});
+
+            const ids = curators.map(el => el.userId);
+
+            for (let i = 0; i < ids.length; i++) {
+                const userId = ids[i];
+
+                await Notification.create({
+                    userId: userId,
+                    text: `Ученик отправил на проверку файл в курсе "${lesson.Course.name}"`
+                })
+            }
 
             await taskAnswerFile.update({wrong: false, link: req.body.link});
 

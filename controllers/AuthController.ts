@@ -287,6 +287,7 @@ class AuthController {
                 const courseUser = await CourseUser.create({
                     userId: find.id,
                     courseId: req.body.courseId,
+                    hasCurator: Boolean(req.body.hasCurator),
                     end: req.body.end,
                 });
 
